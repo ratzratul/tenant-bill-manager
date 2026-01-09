@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="bn">
+   <head>
+      <meta charset="UTF-8" />
+      <title>Tenant Admin Terminal</title>
+      <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet" />
+      <link rel="stylesheet" href="style.css" />
+   </head>
+   <body>
+      <div class="print-only"></div>
+      <div id="login-screen">
+         <div class="login-box">
+            <h2>SECURITY PIN</h2>
+            <input
+               type="password"
+               id="pin-input"
+               maxlength="4"
+               placeholder="****"
+               onkeyup="if(event.key==='Enter') checkPin()"
+               />
+            <button onclick="checkPin()" class="btn-calc">ENTER</button>
+         </div>
+      </div>
+      <div class="terminal-window">
+         <div class="title-bar">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            <span class="title-text">tenant_management_system --v2.0</span>
+         </div>
+         <div class="content">
+            <div class="top-nav">
+               <div class="config-item">
+                  <label>ইউনিট প্রাইজ (৳):</label>
+                  <input type="number" id="globalUnitRate" value="12" />
+               </div>
+               <div class="config-item">
+                  <label>হিসাবের মাস:</label>
+                  <input type="month" id="billingMonth" class="hidden-input" />
+                  <div id="dynamicDateContainer" class="dynamic-date"></div>
+               </div>
+            </div>
+            <div id="tenantAccordion" class="accordion"></div>
+            <div class="footer-actions">
+               <button onclick="calculateAll()" class="btn-calc">RUN CALCULATION</button>
+               <button id="btn-undo" onclick="resetLastInput()" class="btn-undo" style="display:none; background-color: #d9534f; color: white;">RESET LAST INPUT</button>
+               
+               <button onclick="generatePrintView()" class="btn-save">PRINT BILLS</button>
+               <button onclick="downloadBackup()" class="btn-save">DOWNLOAD BACKUP</button>
+               
+               <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+               <button class="btn-import" onclick="document.getElementById('importFile').click()">Upload Backup</button>
+           </div>
+            <div id="printArea" class="print-only">
+               <table>
+                  <thead>
+                     <tr>
+                        <th>
+                           <div id="printHeader"></div>
+                        </th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr>
+                        <td>
+                           <div class="print-grid" id="printGrid"></div>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+      <script src="script.js"></script>
+   </body>
+</html>

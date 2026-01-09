@@ -1,0 +1,319 @@
+:root {
+  --bg-color: #1a1b26;
+  --card-bg: #24283b;
+  --text-main: #a9b1d6;
+  --accent: #7aa2f7;
+  --neon-green: #9ece6a;
+  --neon-pink: #bb9af7;
+  --border: #414868;
+}
+
+body {
+  background-color: #16161e;
+  color: var(--text-main);
+  font-family: "Hind Siliguri", "Consolas", monospace;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  margin: 0;
+}
+
+/* --- Login Screen --- */
+#login-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #16161e;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-box {
+  background: #1a1b26;
+  padding: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  text-align: center;
+  box-shadow: 0 0 20px rgba(122, 162, 247, 0.2);
+}
+
+.login-box h2 {
+  color: var(--accent);
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.login-box input {
+  width: 150px;
+  text-align: center;
+  font-size: 24px;
+  letter-spacing: 8px;
+  background: #16161e;
+  border: 1px solid var(--border);
+  color: var(--neon-pink);
+  margin-bottom: 20px;
+  padding: 10px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* --- Main Terminal Window --- */
+.terminal-window {
+  width: 100%;
+  max-width: 1100px;
+  background: var(--bg-color);
+  border-radius: 10px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.title-bar {
+  background: #2f334d;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+}
+.dot {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+}
+.red {
+  background: #f7768e;
+}
+.yellow {
+  background: #e0af68;
+}
+.green {
+  background: #9ece6a;
+}
+
+.content {
+  padding: 15px;
+}
+
+/* --- Navigation --- */
+.top-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+/* --- Accordion Grid --- */
+.accordion {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.tenant-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+.summary-header {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+
+.summary-header:hover {
+  background: #2f3549;
+}
+
+/* --- Inputs Layout (আলাদা আলাদা ফিল্ডের জন্য) --- */
+.details-panel {
+  display: none;
+  padding: 15px;
+  grid-template-columns: repeat(2, 1fr); /* দুই কলামে ইনপুট */
+  gap: 15px;
+  background: #1f2335;
+  border-top: 1px solid var(--border);
+}
+
+.details-panel.active {
+  display: grid;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.input-group label {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+input,
+select {
+  background: #16161e;
+  border: 1px solid var(--border);
+  color: var(--neon-green);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- Buttons --- */
+button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: 0.2s;
+  font-size: 13px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.2);
+}
+
+.btn-calc {
+  background: var(--accent);
+  color: white;
+}
+.btn-save {
+  background: var(--neon-green);
+  color: #16161e;
+}
+.btn-import {
+  background: var(--neon-pink);
+  color: white;
+}
+.btn-reset {
+  grid-column: span 2;
+  background: transparent;
+  border: 1px solid #f7768e;
+  color: #f7768e;
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+#btn-undo {
+  background: #f7768e;
+  color: white;
+  display: none;
+}
+
+.footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.dynamic-date {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-undo {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+/* --- Responsive --- */
+@media (max-width: 800px) {
+  .accordion,
+  .details-panel {
+     grid-template-columns: 1fr !important;
+  }
+}
+
+/* --- Print View (ক্লিন এবং নিচে নিচে লিস্ট) --- */
+@media print {
+  @page {
+      size: A4;
+      margin: 0; /* ব্রাউজারের ডিফল্ট মার্জিন সরিয়ে দেয়া */
+  }
+  
+  body { margin: 0; padding: 0; background: white; }
+  body * { visibility: hidden; } /* বাকি সব হাইড করা */
+
+  .print-only, .print-only * { visibility: visible; }
+
+  .print-only {
+      display: block !important;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 210mm; /* A4 Width  */
+      height: 297mm; /* A4 Height  */
+      padding-left: 18mm; /* বামে পাঞ্চ করার জায়গা  */
+      box-sizing: border-box;
+  }
+
+  .page-header {
+      height: 12mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 1.5px solid #000;
+      box-sizing: border-box;
+  }
+
+  .print-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* ৩ কলাম  */
+      grid-template-rows: repeat(3, 1fr);    /* ৩ রো  */
+      height: calc(297mm - 12mm); /* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
+      width: 100%;
+      gap: 0;
+  }
+
+  .bill-cell {
+      border: 0.5px solid #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around; /* টেক্সটগুলো সেলের ভেতর ছড়িয়ে থাকবে  */
+      padding: 3px;
+      box-sizing: border-box;
+      overflow: hidden;
+  }
+
+  .bill-cell h4 {
+      margin: 0;
+      font-size: 16px;
+      text-align: center;
+      border-bottom: 1px solid #000;
+      padding-bottom: 2px;
+  }
+
+  .bill-cell p {
+      margin: 0;
+      line-height: 1.1;
+      font-size: 13.5px; /* সর্বোচ্চ বড় ফন্ট  */
+      border-bottom: 0.1px solid #eee;
+  }
+
+  .page-break {
+      page-break-after: always;
+  }
+
+  .no-print { display: none !important; }
+}
+
+/* নরমাল মোডে এরিয়াটি লুকিয়ে রাখা */
+.print-only { display: none; }
