@@ -358,6 +358,7 @@ function generatePrintView() {
     const nextMonthBn = nextDate.toLocaleDateString('bn-BD', {
         month: 'long'
     });
+    
     let printArea = document.querySelector(".print-only");
     if (!printArea) {
         printArea = document.createElement("div");
@@ -366,43 +367,58 @@ function generatePrintView() {
     }
     printArea.innerHTML = "";
 
-    // বাংলা ফন্টের জন্য স্টাইল ইনজেকশন
+    // ব্রাউজার ডিটেকশন লজিক
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const printMargin = isSafari ? "5mm" : "0mm"; 
+
+    // স্টাইল ইনজেকশন
     const style = document.createElement('style');
     style.innerHTML = `
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
 
-    .bill-cell { 
-        font-family: 'Noto Sans Bengali', sans-serif; 
-        line-height: 1.2; 
-        color: #000; 
-        padding: 5px;
-        border: 1px solid #ccc;
-    }
+    @media print {
+        @page {
+            margin: ${printMargin} !important;
+        }
+        
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
 
-    .bill-cell h4 { 
-        margin: 0 0 2px 0; 
-        font-size: 16px; 
-        font-weight: 500; 
-        text-align: center;
-        border-bottom: 2px solid #000;
-        padding-bottom: 3px;
-    }
+        .bill-cell { 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+            line-height: 1.2; 
+            color: #000; 
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
 
-    .bill-cell p { 
-        margin: 3px 0; 
-        font-size: 14px; 
-        font-weight: 500;
-        display: flex;  
-    }
+        .bill-cell h4 { 
+            margin: 0 0 2px 0; 
+            font-size: 16px; 
+            font-weight: 500; 
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 3px;
+        }
 
-    .total-row { 
-        font-size: 15px !important; 
-        font-weight: 500 !important; 
-        border-top: 2px dashed #000; 
-        margin-top: 6px !important; 
-        padding-top: 8px; 
+        .bill-cell p { 
+            margin: 3px 0; 
+            font-size: 14px; 
+            font-weight: 500;
+            display: flex;  
+        }
+
+        .total-row { 
+            font-size: 15px !important; 
+            font-weight: 500 !important; 
+            border-top: 2px dashed #000 !important; /* !important যোগ করা হয়েছে ফায়ারফক্সের জন্য */
+            margin-top: 6px !important; 
+            padding-top: 8px; 
+        }
     }
-`;
+    `;
     document.head.appendChild(style);
 
     const chunks = [tenantIDs.slice(0, 9), tenantIDs.slice(9, 18)];
@@ -476,4 +492,5 @@ function clearTenantBalance(id) {
 
 window.onload = () => {
     if (document.getElementById('pin-input')) document.getElementById('pin-input').focus();
+
 };
