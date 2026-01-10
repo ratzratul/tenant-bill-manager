@@ -244,27 +244,27 @@ button:hover {
 @media print {
   @page {
       size: A4;
-      margin: 0; /* ব্রাউজারের ডিফল্ট মার্জিন সরিয়ে দেয়া */
+      margin: 0 !important; /* ব্রাউজারের ডিফল্ট মার্জিন সরিয়ে দেয়া */
   }
   
-  body { margin: 0; padding: 0; background: white; }
-  body * { visibility: hidden; } /* বাকি সব হাইড করা */
+  body { margin: 0 !important; padding: 0 !important; background: white; }
+  body * { visibility: hidden !important; } /* বাকি সব হাইড করা */
 
-  .print-only, .print-only * { visibility: visible; }
+  .print-only, .print-only * { visibility: visible !important; }
 
   .print-only {
       display: block !important;
       position: absolute;
       left: 0;
       top: 0;
-      width: 210mm; /* A4 Width  */
-      height: 297mm; /* A4 Height  */
-      padding-left: 18mm; /* বামে পাঞ্চ করার জায়গা  */
+      width: 210mm !important; /* A4 Width  */
+      height: 297mm !important; /* A4 Height  */
+      padding-left: 18mm !important; /* বামে পাঞ্চ করার জায়গা  */
       box-sizing: border-box;
   }
 
   .page-header {
-      height: 12mm;
+      height: 12mm !important;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -278,8 +278,8 @@ button:hover {
       display: grid;
       grid-template-columns: repeat(3, 1fr); /* ৩ কলাম  */
       grid-template-rows: repeat(3, 1fr);    /* ৩ রো  */
-      height: calc(297mm - 12mm); /* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
-      width: 100%;
+      height: calc(297mm - 12mm) !important; /* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
+      width: 100% !important;
       gap: 0;
   }
 
@@ -317,3 +317,4 @@ button:hover {
 
 /* নরমাল মোডে এরিয়াটি লুকিয়ে রাখা */
 .print-only { display: none; }
+
