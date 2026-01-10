@@ -18,6 +18,22 @@ body {
   margin: 0;
 }
 
+* {
+    box-sizing: border-box; /* এটি নিশ্চিত করবে প্যাডিং যেন উইডথ না বাড়ায় */
+}
+
+body {
+    padding: 10px;
+    margin: 0;
+    overflow-x: hidden; /* স্ক্রিনের বাইরে যাওয়ার রাস্তা বন্ধ */
+}
+
+.terminal-window {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
 /* --- Login Screen --- */
 #login-screen {
   position: fixed;
@@ -233,11 +249,59 @@ button:hover {
   font-weight: bold;
 }
 /* --- Responsive --- */
-@media (max-width: 800px) {
-  .accordion,
-  .details-panel {
-     grid-template-columns: 1fr !important;
-  }
+/* --- মোবাইল (Portrait) --- */
+@media (max-width: 575.98px) {
+    .top-nav {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .accordion {
+        grid-template-columns: 1fr !important; /* এক কলামে সব */
+    }
+    
+    .details-panel {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .login-box {
+        width: 90%;
+        padding: 20px;
+    }
+
+    button {
+        width: 100%; /* মোবাইলে বড় বাটন ক্লিক করতে সহজ */
+    }
+}
+
+/* --- ট্যাবলেট এবং বড় মোবাইল (Landscape) --- */
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .accordion {
+        grid-template-columns: repeat(2, 1fr) !important; /* দুই কলাম */
+    }
+
+    .top-nav {
+        justify-content: space-between;
+    }
+}
+
+/* --- বড় পিসি বা ডেস্কটপ --- */
+@media (min-width: 992px) {
+    .accordion {
+        grid-template-columns: repeat(2, 1fr); /* বড় স্ক্রিনেও দুই কলাম সুন্দর লাগে */
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .login-box {
+        padding: 10px;
+    }
+    .login-box h2 {
+        margin-bottom: 5px;
+    }
+    .top-nav {
+        flex-direction: row;
+    }
 }
 
 /* --- Print View (ক্লিন এবং নিচে নিচে লিস্ট) --- */
@@ -317,4 +381,5 @@ button:hover {
 
 /* নরমাল মোডে এরিয়াটি লুকিয়ে রাখা */
 .print-only { display: none; }
+
 
