@@ -330,7 +330,7 @@ button:hover {
 
 /* --- Responsive --- */
 /* --- মোবাইল (Portrait) --- */
-@media (max-width: 575.98px) {
+@media (max-width: 991.98px) {
     .top-nav {
         flex-direction: column !important;
         gap: 10px;
@@ -350,25 +350,26 @@ button:hover {
     }
 
     button {
-        width: 100% !important; /* মোবাইলে বড় বাটন ক্লিক করতে সহজ */
+        width: 100% !important;
     }
 }
 
-/* --- ট্যাবলেট এবং বড় মোবাইল (Landscape) --- */
+/* --- ট্যাবলেট এবং বড় মোবাইল (Landscape) 
 @media (min-width: 576px) and (max-width: 991.98px) {
     .accordion {
-        grid-template-columns: repeat(2, 1fr) !important; /* দুই কলাম */
+        grid-template-columns: repeat(2, 1fr) !important; 
     }
 
     .top-nav {
         justify-content: space-between !important;
     }
 }
+--- */
 
 /* --- বড় পিসি বা ডেস্কটপ --- */
 @media (min-width: 992px) {
     .accordion {
-        grid-template-columns: repeat(2, 1fr) !important; /* বড় স্ক্রিনেও দুই কলাম সুন্দর লাগে */
+        grid-template-columns: repeat(2, 1fr) !important; 
     }
 }
 
@@ -383,6 +384,7 @@ button:hover {
         flex-direction: row !important;
     }
 }
+
 
 
 
