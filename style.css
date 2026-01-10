@@ -328,60 +328,82 @@ button:hover {
 /* নরমাল মোডে এরিয়াটি লুকিয়ে রাখা */
 .print-only { display: none; }
 
-/* --- Responsive --- */
-/* --- মোবাইল (Portrait) --- */
-@media (max-width: 991.98px) {
+/* ==========================================================================
+   RESPONSIVE DESIGN (Optimized)
+   ========================================================================== */
+
+/* --- ১. মোবাইল পোর্ট্রেট (Smartphones - Portrait) --- */
+@media (max-width: 575.98px) {
     .top-nav {
         flex-direction: column !important;
-        gap: 10px;
+        align-items: stretch !important;
+        gap: 12px !important;
     }
-    
+
     .accordion {
+        display: grid !important;
         grid-template-columns: 1fr !important; /* এক কলামে সব */
+        gap: 15px !important;
     }
-    
+
     .details-panel {
+        display: none; /* ডিফল্ট হাইড */
         grid-template-columns: 1fr !important;
+        gap: 12px !important;
     }
-    
+
+    .details-panel.active {
+        display: grid !important;
+    }
+
     .login-box {
         width: 90% !important;
         padding: 20px !important;
     }
 
-    button {
+    /* মোবাইলে ইনপুট ও বাটন পুরো স্ক্রিন জুড়ে থাকবে */
+    input, select, button {
         width: 100% !important;
+        font-size: 16px !important; /* ক্লিক করতে সুবিধা হবে */
     }
 }
 
-/* --- ট্যাবলেট এবং বড় মোবাইল (Landscape) 
+/* --- ২. বড় মোবাইল ল্যান্ডস্কেপ ও ট্যাবলেট (Tablets/Landscape) --- */
 @media (min-width: 576px) and (max-width: 991.98px) {
     .accordion {
-        grid-template-columns: repeat(2, 1fr) !important; 
+        grid-template-columns: repeat(2, 1fr) !important; /* দুই কলাম */
+        gap: 20px !important;
     }
 
     .top-nav {
+        flex-direction: row !important;
         justify-content: space-between !important;
     }
 }
---- */
 
-/* --- বড় পিসি বা ডেস্কটপ --- */
+/* --- ৩. ডেস্কটপ ও বড় স্ক্রিন (Desktops) --- */
 @media (min-width: 992px) {
     .accordion {
-        grid-template-columns: repeat(2, 1fr) !important; 
+        grid-template-columns: repeat(2, 1fr) !important;
     }
 }
 
+/* --- ৪. ল্যান্ডস্কেপ স্পেশাল (যখন ফোনের উচ্চতা কম থাকে) --- */
 @media (max-height: 500px) and (orientation: landscape) {
     .login-box {
         padding: 10px !important;
+        max-height: 90vh;
+        overflow-y: auto;
     }
+    
     .login-box h2 {
         margin-bottom: 5px !important;
+        font-size: 18px !important;
     }
+
     .top-nav {
         flex-direction: row !important;
+        gap: 10px !important;
     }
 }
 
