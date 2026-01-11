@@ -181,6 +181,12 @@ body {
   padding-bottom: 15px !important;
 }
 
+.details-panel.active .accord-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
 .details-panel > div {
   min-height: 0;
 }
@@ -450,6 +456,7 @@ button:hover {
       align-items: start !important;
   }
 }
+
 
 
 
