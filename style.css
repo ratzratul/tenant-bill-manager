@@ -151,7 +151,7 @@ body {
 
 /* --- Inputs Layout (আলাদা আলাদা ফিল্ডের জন্য) --- */
 .details-panel {
-  display: none;
+  /*display: none;*/
   padding: 15px;
   grid-template-columns: repeat(2, 1fr); /* দুই কলামে ইনপুট */
   gap: 15px;
@@ -160,7 +160,29 @@ body {
 }
 
 .details-panel.active {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+}
+
+.details-panel {
+  max-height: 0; 
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.details-panel.active {
+  max-height: 1000px; /* একটি বড় ভ্যালু যা আপনার কন্টেন্টের চেয়ে বেশি */
+  opacity: 1;
+  transition: max-height 0.5s ease-in-out, opacity 0.5s ease;
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+}
+
+.details-panel > div {
+  min-height: 0;
 }
 
 .input-group {
@@ -407,6 +429,27 @@ button:hover {
     }
 }
 
+/* --- accordion height balance when auto close --- */
+.accordion {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  align-items: start; /* এটিই সবচাইতে গুরুত্বপূর্ণ: এটি আইটেমগুলোকে লম্বা হতে বাধা দেবে */
+}
+
+.tenant-card {
+  height: fit-content; /* কার্ড যেন শুধুমাত্র নিজের কন্টেন্টের সমান লম্বা হয় */
+  align-self: start;
+  /* আপনার আগের অন্য স্টাইলগুলো এখানে থাকবে... */
+}
+
+/* মোবাইলের জন্য এক কলাম ফিক্স */
+@media (max-width: 575.98px) {
+  .accordion {
+      grid-template-columns: 1fr !important;
+      align-items: start !important;
+  }
+}
 
 
 
