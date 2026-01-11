@@ -131,7 +131,19 @@ function init() {
 }
 
 function togglePanel(id) {
-    document.getElementById(`panel-${id}`).classList.toggle("active");
+    // ১. প্রথমে সব প্যানেল খুঁজে বের করা
+    const allPanels = document.querySelectorAll('.details-panel');
+    const targetPanel = document.getElementById(`panel-${id}`);
+
+    // ২. লুপ চালিয়ে টার্গেট প্যানেল ছাড়া বাকি সব প্যানেল থেকে 'active' ক্লাস সরিয়ে দেওয়া
+    allPanels.forEach(panel => {
+        if (panel !== targetPanel) {
+            panel.classList.remove('active');
+        }
+    });
+
+    // ৩. এখন টার্গেট প্যানেলটি টগল (ওপেন/ক্লোজ) করা
+    targetPanel.classList.toggle('active');
 }
 
 // ৫. ক্যালকুলেশন এবং ব্যাকআপ ডাটা শিটে পাঠানো
@@ -494,3 +506,4 @@ window.onload = () => {
     if (document.getElementById('pin-input')) document.getElementById('pin-input').focus();
 
 };
+
