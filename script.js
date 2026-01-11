@@ -328,8 +328,11 @@ function setupBillingDate() {
 
 function renderDynamicDateControls() {
     const container = document.getElementById("dynamicDateContainer");
-    const curYear = new Date().getFullYear();
+    const now = new Date();
+    const curYear = now.getFullYear(); // বর্তমান বছর (২০২৬)
+    
     let html = `<select id="billingMonth_Year" onchange="updateSelectedYear(this.value)">`;
+    // ২০১৫ থেকে বর্তমান বছর পর্যন্ত লুপ
     for (let i = curYear; i >= 2015; i--) {
         const isSelected = currentSelectedMonth.split('-')[0] == i ? "selected" : "";
         html += `<option value="${i}" ${isSelected}>${enToBnNumber(i)}</option>`;
@@ -338,23 +341,40 @@ function renderDynamicDateControls() {
     updateMonthOptions();
 }
 
+function updateMonthOptions() {
+    const container = document.getElementById("monthDropdownContainer");
+    const names = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+    
+    const now = new Date();
+    const curYear = now.getFullYear();
+    const curMonth = now.getMonth(); // ০ থেকে ১১ (জানুয়ারি = ০)
+    
+    const selectedYear = parseInt(currentSelectedMonth.split('-')[0]);
+
+    let html = `<select id="billingMonth_Month" onchange="updateSelectedMonth(this.value)">`;
+    
+    names.forEach((name, i) => {
+        const val = (i + 1).toString().padStart(2, "0");
+        const isSelected = currentSelectedMonth.split('-')[1] == val ? "selected" : "";
+        
+        // লজিক: যদি সিলেক্ট করা বছর বর্তমান বছর হয়, তবে বর্তমান মাসের পরের মাসগুলো ডিজেবল থাকবে
+        let isDisabled = "";
+        if (selectedYear === curYear && i > curMonth) {
+            isDisabled = "disabled";
+        }
+        
+        html += `<option value="${val}" ${isSelected} ${isDisabled}>${name}</option>`;
+    });
+    
+    container.innerHTML = html + `</select>`;
+}
+
 function updateSelectedYear(year) {
     const month = currentSelectedMonth.split('-')[1] || "01";
     currentSelectedMonth = `${year}-${month}`;
     updateMonthOptions();
 }
 
-function updateMonthOptions() {
-    const container = document.getElementById("monthDropdownContainer");
-    const names = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
-    let html = `<select id="billingMonth_Month" onchange="updateSelectedMonth(this.value)">`;
-    names.forEach((name, i) => {
-        const val = (i + 1).toString().padStart(2, "0");
-        const isSelected = currentSelectedMonth.split('-')[1] == val ? "selected" : "";
-        html += `<option value="${val}" ${isSelected}>${name}</option>`;
-    });
-    container.innerHTML = html + `</select>`;
-}
 
 function updateSelectedMonth(month) {
     const year = currentSelectedMonth.split('-')[0];
@@ -507,5 +527,6 @@ window.onload = () => {
     if (document.getElementById('pin-input')) document.getElementById('pin-input').focus();
 
 };
+
 
 
