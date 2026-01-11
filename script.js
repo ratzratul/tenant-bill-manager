@@ -1,17 +1,21 @@
 const tenantIDs = ["1A", "1B", "1C", "1D", "2A", "2B", "2C", "2D", "4A", "4B", "4C", "4D", "5A", "5B", "5C", "5D", "6A", "6B"];
 let db = {};
 let savedUnitRate = localStorage.getItem("globalUnitRate") || "8.5";
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbw3xSp2yrUKhPu_yY8Xz80FuNX8sf66q-8xD7EsHH3m3_mRiYUCY339w7Ov9BFs96iWgA/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwSOlcUZCFr8CwKTcsAx8OqhzvcKCgr7fxr-MzuVeawW7hIT_VqdYuwYAMKGtj38D7Tsg/exec";
 
 let currentSelectedMonth = "";
 
 // ১. লগইন চেক
 function checkPin() {
-    if (document.getElementById("pin-input").value === "1269") {
+    const pinEntered = document.getElementById("pin-input").value;
+    
+    if (pinEntered !== "") {
+        // এখন আর এখানে ১২৬৯ চেক করছি না, কারণ চেক হবে সার্ভারে।
+        // শুধু ইনপুট থাকলে লগইন স্ক্রিন সরিয়ে ডাটা লোড শুরু করো।
         document.getElementById("login-screen").style.display = "none";
         loadDataFromSheet();
     } else {
-        alert("ভুল পিন!");
+        alert("দয়া করে পিন দিন!");
     }
 }
 
@@ -212,6 +216,8 @@ function importData(input) {
 // ব্যাকআপ ডাটা প্রোসেস এবং শিটে পাঠানোর ফাংশন
 async function uploadBackupData(backupJSON) {
     if (!confirm("ব্যাকআপ ডাটা কি শিটে আপলোড করবেন?")) return;
+    
+    const userPin = document.getElementById("pin-input").value; // পিন সংগ্রহ
     const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
     const month = currentSelectedMonth;
     const syncData = [];
@@ -245,7 +251,11 @@ async function uploadBackupData(backupJSON) {
         });
     });
 
-    // সরাসরি fetch ব্যবহার করছি যাতে কোনো বাড়তি ফাংশনের ওপর নির্ভর করতে না হয়
+    const payload = {
+        pin: userPin, // পিন যোগ করা হলো
+        data: syncData
+    };
+
     try {
         await fetch(SHEET_URL, {
             method: "POST",
@@ -253,9 +263,9 @@ async function uploadBackupData(backupJSON) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(syncData)
+            body: JSON.stringify(payload) // পেলোড পাঠানো হচ্ছে
         });
-        alert("ব্যাকআপ ডাটা সফলভাবে পাঠানো হয়েছে!");
+        alert("ব্যাকআপ ডাটা সফলভাবে পাঠানো হয়েছে!");
     } catch (e) {
         alert("কানেকশন এরর!");
     }
@@ -263,6 +273,14 @@ async function uploadBackupData(backupJSON) {
 
 // সাধারণ সেন্ডিং ফাংশন (যাতে বারবার এলার্ট কোড না লিখতে হয়)
 async function sendToSheet(data) {
+    // লগইন স্ক্রিন থেকে পিনটি সংগ্রহ করা
+    const userPin = document.getElementById("pin-input").value;
+
+    const payload = {
+        pin: userPin, // সার্ভারে পাঠানোর জন্য পিন
+        data: data    // মূল ক্যালকুলেশন ডাটা
+    };
+
     try {
         await fetch(SHEET_URL, {
             method: "POST",
@@ -270,14 +288,13 @@ async function sendToSheet(data) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload) // এখন আমরা পুরো পেলোড পাঠাচ্ছি
         });
 
         alert("অপারেশন সফল! ডাটা পাঠানো হয়েছে।");
         if (document.getElementById("btn-undo")) document.getElementById("btn-undo").style.display = "inline-block";
 
     } catch (e) {
-        // ফায়ারফক্সের জন্য: যদি ডাটা ঠিকই যায় কিন্তু ব্রাউজার এরর দেখায়
         alert("ডাটা পাঠানো হয়েছে। শিট চেক করুন।");
         if (document.getElementById("btn-undo")) document.getElementById("btn-undo").style.display = "inline-block";
     }
@@ -286,15 +303,20 @@ async function sendToSheet(data) {
 // ৬. রিসেট লাস্ট ইনপুট (ডিলিট এবং রিলোড)
 async function resetLastInput() {
     const month = currentSelectedMonth;
-    if (!confirm(getBnMonthName(month) + " মাসের সব ডাটা শিট থেকে মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না।")) return;
+    const userPin = document.getElementById("pin-input").value; // পিন সংগ্রহ
+
+    if (!confirm(getBnMonthName(month) + " মাসের সব ডাটা শিট থেকে মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না।")) return;
 
     try {
-        const response = await fetch(`${SHEET_URL}?action=deleteLast&month=${month}`);
+        // পিনটি URL প্যারামিটার হিসেবে পাঠানো হচ্ছে
+        const response = await fetch(`${SHEET_URL}?action=deleteLast&month=${month}&pin=${userPin}`);
         const result = await response.text();
 
         if (result === "Success") {
-            alert("ডাটা সফলভাবে মোছা হয়েছে। পেজ রিফ্রেশ হচ্ছে...");
+            alert("ডাটা সফলভাবে মোছা হয়েছে। পেজ রিফ্রেশ হচ্ছে...");
             window.location.reload();
+        } else if (result === "Unauthorized") {
+            alert("ভুল পিন! ডাটা মোছার অনুমতি নেই।");
         } else {
             alert("এরর: " + result);
         }
@@ -527,6 +549,7 @@ window.onload = () => {
     if (document.getElementById('pin-input')) document.getElementById('pin-input').focus();
 
 };
+
 
 
 
