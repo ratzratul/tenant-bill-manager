@@ -108,24 +108,25 @@ function init() {
         const card = document.createElement("div");
         card.className = "tenant-card";
         card.innerHTML = `
-            <div class="summary-header" onclick="togglePanel('${t.id}')">
-                <span>[FLAT: ${t.id}]</span><span id="label-${t.id}" class="header-stats">ডাটা ইনপুট করুন...</span>
-            </div>
-            <div class="details-panel" id="panel-${t.id}">
-                <div class="input-group"><label>পূর্বের মিটার রিডিং:</label><input type="number" id="prevM-${t.id}" value="${t.prevMeter}"></div>
-                <div class="input-group"><label>বর্তমান মিটার রিডিং:</label><input type="number" id="currM-${t.id}" value="0"></div>
-                <div class="input-group"><label>ভাড়া:</label><input type="number" id="rent-${t.id}" value="${t.rent}"></div>
-                <div class="input-group"><label>সার্ভিস:</label><input type="number" id="gas-${t.id}" value="${t.gas + t.service}"></div>
-                <div class="input-group"><label>গত মাসের পাওনা:</label><input type="number" id="lastTotal-${t.id}" value="${t.totalLastMonth}"></div>
-                <div class="input-group"><label>গত মাসের জমা:</label><input type="number" id="lastPaid-${t.id}" value="0"></div>
-                
-                <div style="flex-basis: 100%; width: 100%; text-align: center; margin-top: 15px;">
-                    <button type="button" class="btn-clear" onclick="clearTenantBalance('${t.id}')" 
-                        style="background: #800000; color: #f2f2f2; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 98%; font-weight: bold; font-size: 13px;">
-                        নতুন ভাড়াটিয়া (ব্যালেন্স ০ করুন)
-                    </button>
-                </div>
-            </div>`;
+<div class="summary-header" onclick="togglePanel('${t.id}')">
+   <span>[FLAT: ${t.id}]</span><span id="label-${t.id}" class="header-stats">ডাটা ইনপুট করুন...</span>
+</div>
+<div class="details-panel" id="panel-${t.id}">
+   <div class="accord-grid">
+      <div class="input-group"><label>পূর্বের মিটার রিডিং:</label><input type="number" id="prevM-${t.id}" value="${t.prevMeter}"></div>
+      <div class="input-group"><label>বর্তমান মিটার রিডিং:</label><input type="number" id="currM-${t.id}" value="0"></div>
+      <div class="input-group"><label>ভাড়া:</label><input type="number" id="rent-${t.id}" value="${t.rent}"></div>
+      <div class="input-group"><label>সার্ভিস:</label><input type="number" id="gas-${t.id}" value="${t.gas + t.service}"></div>
+      <div class="input-group"><label>গত মাসের পাওনা:</label><input type="number" id="lastTotal-${t.id}" value="${t.totalLastMonth}"></div>
+      <div class="input-group"><label>গত মাসের জমা:</label><input type="number" id="lastPaid-${t.id}" value="0"></div>
+   </div>
+   <div style="flex-basis: 100%; width: 100%; text-align: center; margin-top: 15px;">
+      <button type="button" class="btn-clear" onclick="clearTenantBalance('${t.id}')" 
+         style="background: #800000; color: #f2f2f2; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 98%; font-weight:  bold; font-size: 13px;">
+      নতুন ভাড়াটিয়া (ব্যালেন্স ০ করুন)
+      </button>
+   </div>
+</div>`;
         container.appendChild(card);
     });
 }
@@ -506,4 +507,5 @@ window.onload = () => {
     if (document.getElementById('pin-input')) document.getElementById('pin-input').focus();
 
 };
+
 
