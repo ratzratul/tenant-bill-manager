@@ -450,7 +450,7 @@ function generatePrintView() {
 @page { margin: ${printMargin} !important; }
 * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 .bill-cell { font-family: 'Noto Sans Bengali', sans-serif; line-height: 1.2; color: #000; padding: 5px; border: 1px solid #ccc; }
-.bill-cell h4 { margin: 0 0 2px 0; font-size: 16px; font-weight: 600; text-align: center; border-bottom: 2px solid #000; padding-bottom: 3px; }
+.bill-cell h4 { margin: 0 0 2px 0; font-size: 16px; font-weight: 500; text-align: center; border-bottom: 2px solid #000; padding-bottom: 3px; }
 .bill-cell p { margin: 3px 0; font-size: 14px; font-weight: 500; display: flex; }
 .total-row { font-size: 15px !important; font-weight: 700 !important; border-top: 2px dashed #000 !important; margin-top: 6px !important; padding-top: 8px; }
 }`;
@@ -461,7 +461,7 @@ function generatePrintView() {
     chunks.forEach((chunk, index) => {
         let pageDiv = document.createElement("div");
         pageDiv.className = "page-container " + (index === 0 ? "page-break" : "");
-        let html = `<div class="page-header"><h4>ভাড়া ও বিদ্যুৎ বিল - ${formattedMonth}</h4></div><div class="print-grid">`;
+        let html = `<div class="page-header"><h4>ভাড়া ও বিদ্যুৎ বিল : ${formattedMonth}</h4></div><div class="print-grid">`;
 
         chunk.forEach((id) => {
             const curr = parseFloat(document.getElementById(`currM-${id}`).value) || 0;
@@ -503,3 +503,4 @@ function generatePrintView() {
 window.onload = () => {
     if (document.getElementById('pin-input')) document.getElementById('pin-input').focus();
 };
+
