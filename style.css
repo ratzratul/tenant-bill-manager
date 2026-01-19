@@ -1,360 +1,616 @@
 :root {
-  --bg-color: #1a1b26;
-  --card-bg: #24283b;
-  --text-main: #a9b1d6;
-  --accent: #7aa2f7;
-  --neon-green: #9ece6a;
-  --neon-pink: #bb9af7;
-  --border: #414868;
+	--bg-color: #1a1b26;
+	--card-bg: #24283b;
+	--text-main: #a9b1d6;
+	--accent: #7aa2f7;
+	--neon-green: #9ece6a;
+	--neon-pink: #bb9af7;
+	--border: #414868;
 }
 
 body {
-  background-color: #16161e;
-  color: var(--text-main);
-  font-family: "Hind Siliguri", "Consolas", monospace;
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  margin: 0;
+	background-color: #16161e;
+	color: var(--text-main);
+	font-family: "Hind Siliguri", "Consolas", monospace;
+	display: flex;
+	justify-content: center;
+	padding: 10px;
+	margin: 0;
+	overflow-x: hidden;
+	/* স্ক্রিনের বাইরে যাওয়ার রাস্তা বন্ধ */
 }
 
 * {
-    box-sizing: border-box; /* এটি নিশ্চিত করবে প্যাডিং যেন উইডথ না বাড়ায় */
-}
-
-body {
-    padding: 10px;
-    margin: 0;
-    overflow-x: hidden; /* স্ক্রিনের বাইরে যাওয়ার রাস্তা বন্ধ */
+	box-sizing: border-box;
+	/* এটি নিশ্চিত করবে প্যাডিং যেন উইডথ না বাড়ায় */
 }
 
 .terminal-window {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
+	width: 100%;
+	max-width: 1100px;
+	margin: 0 auto;
 }
 
 /* --- Login Screen --- */
 #login-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #16161e;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #16161e;
+	z-index: 10000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .login-box {
-  background: #1a1b26;
-  padding: 40px;
-  border-radius: 10px;
-  border: 1px solid var(--accent);
-  text-align: center;
-  box-shadow: 0 0 20px rgba(122, 162, 247, 0.2);
+	background: #1a1b26;
+	padding: 40px;
+	border-radius: 10px;
+	border: 1px solid var(--accent);
+	text-align: center;
+	box-shadow: 0 0 20px rgba(122, 162, 247, 0.2);
 }
 
 .login-box h2 {
-  color: var(--accent);
-  margin-bottom: 20px;
-  letter-spacing: 2px;
+	color: var(--accent);
+	margin-bottom: 20px;
+	letter-spacing: 2px;
 }
 
 .login-box input {
-  width: 150px;
-  text-align: center;
-  font-size: 24px;
-  letter-spacing: 8px;
-  background: #16161e;
-  border: 1px solid var(--border);
-  color: var(--neon-pink);
-  margin-bottom: 20px;
-  padding: 10px;
-  display: block;
-  margin: 0 auto;
+	width: 150px;
+	text-align: center;
+	font-size: 24px;
+	letter-spacing: 8px;
+	background: #16161e;
+	border: 1px solid var(--border);
+	color: var(--neon-pink);
+	margin-bottom: 20px;
+	padding: 10px;
+	display: block;
+	margin: 0 auto;
 }
 
 /* --- Main Terminal Window --- */
 .terminal-window {
-  width: 100%;
-  max-width: 1100px;
-  background: var(--bg-color);
-  border-radius: 10px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--border);
-  overflow: hidden;
+	width: 100%;
+	max-width: 1100px;
+	background: var(--bg-color);
+	border-radius: 10px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+	border: 1px solid var(--border);
+	overflow: hidden;
 }
 
 .title-bar {
-  background: #2f334d;
-  padding: 10px;
-  display: flex;
-  gap: 8px;
+	background: #2f334d;
+	padding: 10px;
+	display: flex;
+	gap: 8px;
 }
+
 .dot {
-  height: 12px;
-  width: 12px;
-  border-radius: 50%;
+	height: 12px;
+	width: 12px;
+	border-radius: 50%;
 }
+
 .red {
-  background: #f7768e;
+	background: #f7768e;
 }
+
 .yellow {
-  background: #e0af68;
+	background: #e0af68;
 }
+
 .green {
-  background: #9ece6a;
+	background: #9ece6a;
 }
 
 .content {
-  padding: 15px;
+	padding: 15px;
 }
 
 /* --- Navigation --- */
 .top-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  border-bottom: 1px dashed var(--border);
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	border-bottom: 1px dashed var(--border);
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+}
+
+.config-item {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	flex: 1;
+	/* বড় স্ক্রিনে সমান জায়গা নিবে */
+	min-width: 160px;
+	/* একদম ছোট হয়ে যাওয়া ঠেকাবে */
+}
+
+/* রেট ইনপুট স্টাইল */
+#globalUnitRate {
+	background: #16161e;
+	border: 1px solid var(--border);
+	color: var(--neon-green);
+	padding: 8px;
+	border-radius: 4px;
+	font-size: 14px;
+	width: 100%;
+	outline: none;
+}
+
+/* মাস ও বছরের কন্টেইনার (Dynamic Date) */
+#dynamicDateContainer {
+	display: flex !important;
+	gap: 8px;
+	/* মাস ও বছরের মাঝখানে গ্যাপ */
+	width: 100%;
+}
+
+/* মাসের ড্রপডাউন কন্টেইনার (span টি flex করবে) */
+#monthDropdownContainer {
+	flex: 2;
+	/* মাস ২ গুণ জায়গা নিবে */
+}
+
+/* বছরের ড্রপডাউন */
+#billingMonth_Year {
+	flex: 1;
+	/* বছর ১ গুণ জায়গা নিবে */
+	min-width: 80px;
+	/* সাল যেন কেটে না যায় */
+}
+
+/* নিশ্চিত করা যেন সিলেক্টগুলো পুরো জায়গা নেয় */
+#billingMonth_Month,
+#billingMonth_Year {
+	width: 100% !important;
+}
+
+/* মোবাইল রেসপন্সিভনেস */
+@media (max-width: 480px) {
+	.config-item {
+		flex: 1 1 100%;
+		/* মোবাইলে একটির নিচে আরেকটি আসবে */
+	}
 }
 
 /* --- Accordion Grid --- */
 .accordion {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20px;
 }
 
 .tenant-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
+	background: var(--card-bg);
+	border: 1px solid var(--border);
+	border-radius: 5px;
 }
 
 .summary-header {
-  padding: 12px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  transition: 0.3s;
+	padding: 12px;
+	cursor: pointer;
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.9rem;
+	transition: 0.3s;
 }
 
 .summary-header:hover {
-  background: #2f3549;
+	background: #2f3549;
 }
 
 /* --- Inputs Layout (আলাদা আলাদা ফিল্ডের জন্য) --- */
 .details-panel {
-  /*display: none;*/
-  padding: 15px;
-  grid-template-columns: repeat(2, 1fr); /* দুই কলামে ইনপুট */
-  gap: 15px;
-  background: #1f2335;
-  border-top: 1px solid var(--border);
+	/*display: none;*/
+	padding: 15px;
+	grid-template-columns: repeat(2, 1fr);
+	/* দুই কলামে ইনপুট */
+	gap: 15px;
+	background: #1f2335;
+	border-top: 1px solid var(--border);
 }
 
 .details-panel.active {
-  display: flex;
-  flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .details-panel {
-  max-height: 0; 
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+	max-height: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
 }
 
 .details-panel.active {
-  max-height: 1000px; /* একটি বড় ভ্যালু যা আপনার কন্টেন্টের চেয়ে বেশি */
-  opacity: 1;
-  transition: max-height 0.5s ease-in-out, opacity 0.5s ease;
-  padding-top: 15px !important;
-  padding-bottom: 15px !important;
+	max-height: 1000px;
+	/* একটি বড় ভ্যালু যা আপনার কন্টেন্টের চেয়ে বেশি */
+	opacity: 1;
+	transition: max-height 0.5s ease-in-out, opacity 0.5s ease;
+	padding-top: 15px !important;
+	padding-bottom: 15px !important;
 }
 
 .details-panel.active .accord-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 10px;
 }
 
-.details-panel > div {
-  min-height: 0;
+.details-panel>div {
+	min-height: 0;
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
 }
+
 .input-group label {
-  font-size: 11px;
-  color: var(--accent);
-  font-weight: bold;
+	font-size: 11px;
+	color: var(--accent);
+	font-weight: bold;
 }
 
 input,
 select {
-  background: #16161e;
-  border: 1px solid var(--border);
-  color: var(--neon-green);
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
+	background: #16161e;
+	border: 1px solid var(--border);
+	color: var(--neon-green);
+	padding: 8px;
+	border-radius: 4px;
+	font-size: 14px;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 /* --- Buttons --- */
 button {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  text-transform: uppercase;
-  transition: 0.2s;
-  font-size: 13px;
+	padding: 10px 18px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: bold;
+	text-transform: uppercase;
+	transition: 0.2s;
+	font-size: 13px;
 }
 
 button:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.2);
+	transform: translateY(-2px);
+	filter: brightness(1.2);
 }
 
 .btn-calc {
-  background: var(--accent);
-  color: white;
+	background: var(--accent);
+	color: white;
 }
+
 .btn-save {
-  background: var(--neon-green);
-  color: #16161e;
+	background: var(--neon-green);
+	color: #16161e;
 }
+
 .btn-import {
-  background: var(--neon-pink);
-  color: white;
+	background: var(--neon-pink);
+	color: white;
 }
+
 .btn-reset {
-  grid-column: span 2;
-  background: transparent;
-  border: 1px solid #f7768e;
-  color: #f7768e;
-  font-size: 11px;
-  margin-top: 5px;
+	grid-column: span 2;
+	background: transparent;
+	border: 1px solid #f7768e;
+	color: #f7768e;
+	font-size: 11px;
+	margin-top: 5px;
+}
+
+/* বাটন কন্টেইনার */
+.accord-btn {
+	display: flex;
+	flex-direction: column-reverse;
+	/* মোবাইলে: উপরের বাটন নিচে এবং নিচের বাটন উপরে যাবে */
+	gap: 10px;
+	/* বাটন দুটির মাঝখানে গ্যাপ */
+	margin-top: 15px;
+	margin-bottom: 10px;
+	width: 100%;
+}
+
+/* কমন বাটন স্টাইল */
+.btn-paid,
+.btn-clear {
+	width: 100%;
+	/* মোবাইলে বাটন পুরো জায়গা নিবে */
+	border: none;
+	padding: 12px;
+	border-radius: 5px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: opacity 0.2s;
+}
+
+.btn-paid {
+	background: #28a745;
+	color: white;
+	font-size: 14px;
+}
+
+.btn-clear {
+	background: #800000;
+	color: #f2f2f2;
+	font-size: 13px;
+}
+
+.btn-paid:hover,
+.btn-clear:hover {
+	opacity: 0.9;
+}
+
+/* বড় স্ক্রিনের জন্য (Responsive) */
+@media (min-width: 600px) {
+	.accord-btn {
+		flex-direction: row;
+		/* বড় স্ক্রিনে পাশাপাশি */
+		justify-content: space-between;
+	}
+
+	.btn-clear {
+		flex: 1;
+		/* বাটন সমান জায়গা নিবে */
+		max-width: 48%;
+		/* বাটন দুটির মাঝখানে গ্যাপ রাখার জন্য */
+	}
+
+	.btn-paid {
+		flex: 1;
+		max-width: 48%;
+	}
 }
 
 #btn-undo {
-  background: #f7768e;
-  color: white;
-  display: none;
+	background: #f7768e;
+	color: white;
+	display: none;
 }
 
 .footer-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 20px;
 }
+
 .dynamic-date {
-  display: flex;
-  gap: 5px;
+	display: flex;
+	gap: 5px;
 }
 
 .btn-undo {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-weight: bold;
 }
 
+/* বালুঘড়ির loader */
+
+#global-loader {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.8);
+	z-index: 10000;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+.hourglass-big {
+	animation: rotate-hourglass 2s infinite;
+}
+
+@keyframes rotate-hourglass {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	80% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(180deg);
+	}
+}
+
+/* বালু কমা এবং বাড়ার ইফেক্ট */
+.sand-top {
+	animation: sand-empty 2s infinite;
+	transform-origin: bottom;
+}
+
+.sand-bottom {
+	animation: sand-fill 2s infinite;
+	transform-origin: bottom;
+	transform: scaleY(0);
+}
+
+@keyframes sand-empty {
+	0% {
+		transform: scaleY(1);
+	}
+
+	80% {
+		transform: scaleY(0);
+	}
+
+	100% {
+		transform: scaleY(0);
+	}
+}
+
+@keyframes sand-fill {
+	0% {
+		transform: scaleY(0);
+	}
+
+	80% {
+		transform: scaleY(1);
+	}
+
+	100% {
+		transform: scaleY(1);
+	}
+}
+
+#loader-text {
+	white-space: pre-wrap;
+	/* এটি স্পেস এবং নিউ লাইন ঠিকমতো দেখাবে */
+	display: inline-block;
+	margin-top: 20px;
+	font-size: 18px;
+	font-weight: bold;
+	min-height: 1.2em;
+}
+
+/* --- Responsive --- */
+@media (max-width: 800px) {
+
+	.accordion,
+	.details-panel {
+		grid-template-columns: 1fr !important;
+	}
+}
 
 /* --- Print View (ক্লিন এবং নিচে নিচে লিস্ট) --- */
 @media print {
-  @page {
-      size: A4;
-      margin: 0 !important; /* ব্রাউজারের ডিফল্ট মার্জিন সরিয়ে দেয়া */
-  }
-  
-  body { margin: 0 !important; padding: 0 !important; background: white; }
-  body * { visibility: hidden !important; } /* বাকি সব হাইড করা */
+	@page {
+		size: A4;
+		margin: 0 !important;
+		/* ব্রাউজারের ডিফল্ট মার্জিন সরিয়ে দেয়া */
+	}
 
-  .print-only, .print-only * { visibility: visible !important; }
+	body {
+		margin: 0 !important;
+		padding: 0 !important;
+		background: white;
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
 
-  .print-only {
-      display: block !important;
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 210mm !important; /* A4 Width  */
-      height: 297mm !important; /* A4 Height  */
-      padding-left: 18mm !important; /* বামে পাঞ্চ করার জায়গা  */
-      box-sizing: border-box;
-  }
+	body * {
+		visibility: hidden !important;
+	}
 
-  .page-header {
-      height: 12mm !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: bold;
-      border-bottom: 1.5px solid #000;
-      box-sizing: border-box;
-  }
+	/* বাকি সব হাইড করা */
+	header,
+	footer,
+	nav,
+	.no-print {
+		display: none !important;
+	}
 
-  .print-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr); /* ৩ কলাম  */
-      grid-template-rows: repeat(3, 1fr);    /* ৩ রো  */
-      height: calc(297mm - 12mm) !important; /* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
-      width: 100% !important;
-      gap: 0;
-  }
+	.print-only,
+	.print-only * {
+		visibility: visible !important;
+	}
 
-  .bill-cell {
-      border: 0.5px solid #000;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around; /* টেক্সটগুলো সেলের ভেতর ছড়িয়ে থাকবে  */
-      padding: 3px;
-      box-sizing: border-box;
-      overflow: hidden;
-  }
+	.print-only {
+		display: block !important;
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 210mm !important;
+		/* A4 Width  */
+		height: 297mm !important;
+		/* A4 Height  */
+		padding-left: 18mm !important;
+		/* বামে পাঞ্চ করার জায়গা  */
+		box-sizing: border-box;
+	}
 
-  .bill-cell h4 {
-      margin: 0;
-      font-size: 16px;
-      text-align: center;
-      border-bottom: 1px solid #000;
-      padding-bottom: 2px;
-  }
+	.page-header {
+		height: 12mm !important;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 20px;
+		font-weight: bold;
+		border-bottom: 1.5px solid #000;
+		box-sizing: border-box;
+	}
 
-  .bill-cell p {
-      margin: 0;
-      line-height: 1.1;
-      font-size: 13.5px; /* সর্বোচ্চ বড় ফন্ট  */
-      border-bottom: 0.1px solid #eee;
-  }
+	.print-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		/* ৩ কলাম  */
+		grid-template-rows: repeat(3, 1fr);
+		/* ৩ রো  */
+		height: calc(297mm - 12mm) !important;
+		/* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
+		width: 100% !important;
+		gap: 0;
+	}
 
-  .page-break {
-      page-break-after: always;
-  }
+	.bill-cell {
+		border: 0.5px solid #000;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		/* টেক্সটগুলো সেলের ভেতর ছড়িয়ে থাকবে  */
+		padding: 3px;
+		box-sizing: border-box;
+		overflow: hidden;
+	}
 
-  .no-print { display: none !important; }
+	.bill-cell h4 {
+		margin: 0;
+		font-size: 16px;
+		text-align: center;
+		border-bottom: 1px solid #000;
+		padding-bottom: 2px;
+	}
+
+	.bill-cell p {
+		margin: 0;
+		line-height: 1.1;
+		font-size: 13.5px;
+		/* সর্বোচ্চ বড় ফন্ট  */
+		border-bottom: 0.1px solid #eee;
+	}
+
+	.page-break {
+		page-break-after: always;
+	}
+
+	.no-print {
+		display: none !important;
+	}
 }
 
 /* নরমাল মোডে এরিয়াটি লুকিয়ে রাখা */
-.print-only { display: none; }
+.print-only {
+	display: none;
+}
 
 /* ==========================================================================
    RESPONSIVE DESIGN (Optimized)
@@ -362,101 +618,106 @@ button:hover {
 
 /* --- ১. মোবাইল পোর্ট্রেট (Smartphones - Portrait) --- */
 @media (max-width: 575.98px) {
-    .top-nav {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 12px !important;
-    }
+	.top-nav {
+		flex-direction: column !important;
+		align-items: stretch !important;
+		gap: 12px !important;
+	}
 
-    .accordion {
-        display: grid !important;
-        grid-template-columns: 1fr !important; /* এক কলামে সব */
-        gap: 15px !important;
-    }
+	.accordion {
+		display: grid !important;
+		grid-template-columns: 1fr !important;
+		/* এক কলামে সব */
+		gap: 15px !important;
+	}
 
-    .details-panel {
-        display: none; /* ডিফল্ট হাইড */
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-    }
+	.details-panel {
+		display: none;
+		/* ডিফল্ট হাইড */
+		grid-template-columns: 1fr !important;
+		gap: 12px !important;
+	}
 
-    .details-panel.active {
-        display: grid !important;
-    }
+	.details-panel.active {
+		display: grid !important;
+	}
 
-    .login-box {
-        width: 90% !important;
-        padding: 20px !important;
-    }
+	.login-box {
+		width: 90% !important;
+		padding: 20px !important;
+	}
 
-    /* মোবাইলে ইনপুট ও বাটন পুরো স্ক্রিন জুড়ে থাকবে */
-    input, select, button {
-        width: 100% !important;
-        font-size: 16px !important; /* ক্লিক করতে সুবিধা হবে */
-    }
+	/* মোবাইলে ইনপুট ও বাটন পুরো স্ক্রিন জুড়ে থাকবে */
+	input,
+	select,
+	button {
+		width: 100% !important;
+		font-size: 16px !important;
+		/* ক্লিক করতে সুবিধা হবে */
+	}
 }
 
 /* --- ২. বড় মোবাইল ল্যান্ডস্কেপ ও ট্যাবলেট (Tablets/Landscape) --- */
 @media (min-width: 576px) and (max-width: 991.98px) {
-    .accordion {
-        grid-template-columns: repeat(2, 1fr) !important; /* দুই কলাম */
-        gap: 20px !important;
-    }
+	.accordion {
+		grid-template-columns: repeat(2, 1fr) !important;
+		/* দুই কলাম */
+		gap: 20px !important;
+	}
 
-    .top-nav {
-        flex-direction: row !important;
-        justify-content: space-between !important;
-    }
+	.top-nav {
+		flex-direction: row !important;
+		justify-content: space-between !important;
+	}
 }
 
 /* --- ৩. ডেস্কটপ ও বড় স্ক্রিন (Desktops) --- */
 @media (min-width: 992px) {
-    .accordion {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
+	.accordion {
+		grid-template-columns: repeat(2, 1fr) !important;
+	}
 }
 
 /* --- ৪. ল্যান্ডস্কেপ স্পেশাল (যখন ফোনের উচ্চতা কম থাকে) --- */
 @media (max-height: 500px) and (orientation: landscape) {
-    .login-box {
-        padding: 10px !important;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-    
-    .login-box h2 {
-        margin-bottom: 5px !important;
-        font-size: 18px !important;
-    }
+	.login-box {
+		padding: 10px !important;
+		max-height: 90vh;
+		overflow-y: auto;
+	}
 
-    .top-nav {
-        flex-direction: row !important;
-        gap: 10px !important;
-    }
+	.login-box h2 {
+		margin-bottom: 5px !important;
+		font-size: 18px !important;
+	}
+
+	.top-nav {
+		flex-direction: row !important;
+		gap: 10px;
+	}
 }
 
 /* --- accordion height balance when auto close --- */
+
 .accordion {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  align-items: start; /* এটিই সবচাইতে গুরুত্বপূর্ণ: এটি আইটেমগুলোকে লম্বা হতে বাধা দেবে */
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20px;
+	align-items: start;
+	/* এটিই সবচাইতে গুরুত্বপূর্ণ: এটি আইটেমগুলোকে লম্বা হতে বাধা দেবে */
 }
 
 .tenant-card {
-  height: fit-content; /* কার্ড যেন শুধুমাত্র নিজের কন্টেন্টের সমান লম্বা হয় */
-  align-self: start;
-  /* আপনার আগের অন্য স্টাইলগুলো এখানে থাকবে... */
+	height: fit-content;
+	/* কার্ড যেন শুধুমাত্র নিজের কন্টেন্টের সমান লম্বা হয় */
+	align-self: start;
+	/* আপনার আগের অন্য স্টাইলগুলো এখানে থাকবে... */
 }
 
 /* মোবাইলের জন্য এক কলাম ফিক্স */
 @media (max-width: 575.98px) {
-  .accordion {
-      grid-template-columns: 1fr !important;
-      align-items: start !important;
-  }
+	.accordion {
+		grid-template-columns: 1fr !important;
+		align-items: start !important;
+	}
 }
-
-
-
-
