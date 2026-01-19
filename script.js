@@ -1,14 +1,69 @@
-// FINAL Version
+// ==========================================
+// FINAL VERSION 
+// ==========================================
 
-// ১. গ্লোবাল ভেরিয়েবল (আপনার লেটেস্ট SHEET_URL ব্যবহার করুন)
+// ১. গ্লোবাল ভেরিয়েবল
 const tenantIDs = ["1A", "1B", "1C", "1D", "2A", "2B", "2C", "2D", "4A", "4B", "4C", "4D", "5A", "5B", "5C", "5D", "6A", "6B"];
 let db = {};
 let savedUnitRate = localStorage.getItem("globalUnitRate") || "8.5";
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbzzjtXlK6mpX-nQsiKIHW72S9ddazW-lD-MPEesC6R9hyBbdGApJwxub1DVWXq76A1vYw/exec";
 
 let currentSelectedMonth = "";
+let typeInterval; // টাইপিং এনিমেশনের জন্য
 
-// ২. লগইন চেক (সিকিউর: কোডে পিন নেই, শুধু ইনপুট চেক করছে)
+// ==========================================
+// ২. লোডার ফাংশন (Manually Added HTML Control)
+// ==========================================
+
+function showGlobalLoader(message) {
+    const loader = document.getElementById('global-loader');
+    const textEl = document.getElementById('loader-text');
+
+    if (loader && textEl) {
+        loader.style.display = 'flex';
+
+        // টাইপিং ইফেক্ট শুরু
+        textEl.textContent = "";
+        let i = 0;
+        clearInterval(typeInterval); // আগের ইন্টারভাল থাকলে ক্লিয়ার করবে
+
+        typeInterval = setInterval(() => {
+            if (i < message.length) {
+                // textContent ব্যবহার করলে স্পেস ঠিকমতো কাজ করে
+                textEl.textContent += message.charAt(i);
+                i++;
+            } else {
+                // লেখা শেষ হলে ডট অ্যানিমেশন (...)
+                if (textEl.textContent.length < message.length + 3) {
+                    textEl.textContent += ".";
+                } else {
+                    // ৩টি ডট হয়ে গেলে আবার মেইন মেসেজে ফিরে যাবে (লুপ হবে)
+                    textEl.textContent = message;
+                }
+            }
+        }, 80);
+    }
+}
+
+function hideGlobalLoader() {
+    const loader = document.getElementById('global-loader');
+    if (loader) {
+        loader.style.display = 'none'; // লোডার লুকিয়ে ফেলবে
+    }
+    clearInterval(typeInterval);
+}
+
+// ==========================================
+// ৩. অথেন্টিকেশন ও স্টার্টআপ
+// ==========================================
+
+// পেজ লোড হলে পিন ইনপুটে ফোকাস করবে 
+window.onload = () => {
+    if (document.getElementById('pin-input')) {
+        document.getElementById('pin-input').focus();
+    }
+};
+
 function checkPin() {
     const pinEntered = document.getElementById("pin-input").value;
     if (pinEntered !== "") {
@@ -19,13 +74,13 @@ function checkPin() {
     }
 }
 
-// ৩. ডিফল্ট সেটআপ (গিটহাবের রেন্ট লজিক এখানে যুক্ত আছে)
 async function loadDataFromSheet() {
     if (!currentSelectedMonth) {
         const now = new Date();
         currentSelectedMonth = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, "0")}`;
     }
 
+    // ডিফল্ট ভ্যালু সেটআপ
     tenantIDs.forEach(id => {
         let defaultRent = 0;
         if (id === "1A" || id === "2A" || id === "4A" || id === "5A" || id === "6A") defaultRent = 4000;
@@ -44,41 +99,60 @@ async function loadDataFromSheet() {
         };
     });
 
-    init(); // UI আগে তৈরি হবে
-    handleMonthChange(); // তারপর ডাটা ফেচ হবে
+    init(); // UI তৈরি
+    handleMonthChange(); // ডাটা ফেচ
 }
 
-// ৪. স্মার্ট ডাটা হ্যান্ডলার (পিসি কোডের স্মার্ট লুক-ব্যাক এবং সিকিউর পিন)
+// ==========================================
+// ৪. ডাটা ফেচিং (লোডার সহ)
+// ==========================================
+
 async function handleMonthChange() {
     const selectedMonth = currentSelectedMonth;
     const pin = document.getElementById("pin-input").value;
+
+    // লোডার চালু
+    showGlobalLoader("সার্ভার থেকে ডাটা লোড করা হচ্ছে...");
+
     try {
         const response = await fetch(`${SHEET_URL}?action=getMonthData&month=${selectedMonth}&pin=${pin}`);
         const currentData = await response.json();
 
         if (currentData && currentData.length > 0) {
-            renderDataToUI(currentData); // ডাটা থাকলে সরাসরি রেন্ডার
-            alert(getBnMonthName(selectedMonth) + " মাসের ডাটা লোড হয়েছে।");
+            renderDataToUI(currentData);
+            // ডাটা পাওয়া গেলে সরাসরি লোডার বন্ধ, কোনো মেসেজ/অ্যালার্ট দরকার নেই
         } else {
-            // যদি কারেন্ট মাসে ডাটা না থাকে, আগের মাস চেক করো
+            // কারেন্ট মাসে ডাটা না থাকলে মেসেজ আপডেট
+            showGlobalLoader("বর্তমান ডাটা নেই! আগের মাসের রিডিং খোঁজা হচ্ছে...");
+
             const prevMonth = getPreviousMonth(selectedMonth);
             const prevResponse = await fetch(`${SHEET_URL}?action=getMonthData&month=${prevMonth}&pin=${pin}`);
             const prevData = await prevResponse.json();
 
             if (prevData && prevData.length > 0) {
                 populateFromPrevious(prevData);
-                alert(`নতুন মাস! ${getBnMonthName(prevMonth)} মাসের মিটার রিডিং এবং বকেয়া আনা হয়েছে।`);
+                // ইউজারকে পড়ার সময় দেওয়ার জন্য ১.৫ সেকেন্ড অপেক্ষা
+                showGlobalLoader(`${getBnMonthName(prevMonth)} মাসের রিডিং অটোমেটিক বসানো হয়েছে...`);
+                await new Promise(resolve => setTimeout(resolve, 1500));
             } else {
                 resetToDefaults();
-                alert("পূর্বের কোনো ডাটা পাওয়া যায়নি। ডিফল্ট ভ্যালু সেট করা হয়েছে।");
+                // ডিফল্ট ভ্যালু সেট করার মেসেজ
+                showGlobalLoader("কোনো পূর্ববর্তী ডাটা পাওয়া যায়নি। ডিফল্ট সেট করা হচ্ছে...");
+                await new Promise(resolve => setTimeout(resolve, 1500));
             }
         }
     } catch (e) {
         console.error("Load Error:", e);
+        alert("ডাটা লোড করতে সমস্যা হয়েছে। ইন্টারনেট চেক করুন।"); // শুধু এরর হলে অ্যালার্ট থাকবে
+    } finally {
+        hideGlobalLoader(); // কাজ শেষ
     }
 }
 
-// ৫. UI রেন্ডারিং ও পপুলেশন 
+// ==========================================
+// ৫. UI রেন্ডারিং
+// ==========================================
+
 function renderDataToUI(data) {
     const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
     data.forEach(row => {
@@ -89,7 +163,7 @@ function renderDataToUI(data) {
             document.getElementById(`rent-${id}`).value = row.rent;
             document.getElementById(`gas-${id}`).value = row.service;
             document.getElementById(`lastTotal-${id}`).value = row.dues;
-            document.getElementById(`lastPaid-${id}`).value = 0;
+            document.getElementById(`lastPaid-${id}`).value = row.paid || 0; // lastPaid যদি থাকে
 
             const units = row.currM - row.prevM;
             const eBill = (units * rate).toFixed(0);
@@ -126,13 +200,11 @@ function updateHeaderLabel(id, units, eBill, dues, total) {
     const label = document.getElementById(`label-${id}`);
     if (label) {
         label.innerHTML = `
-<span style="font-size: 0.9em;">Unit: ${units}, E.Bill: ৳${eBill}, Dues: ৳${dues},</span>
-<span style="color: #ff007f; font-weight: bold; margin-left: 5px;"> Total: ৳${total}</span>
-`;
+        <span style="font-size: 0.9em;">E.Bill: ৳${eBill}, Dues: ৳${dues},</span>
+        <span style="color: #ff007f; font-weight: bold; margin-left: 5px;"> Total: ৳${total}</span>`;
     }
 }
 
-// ৬. ইন্টারফেস তৈরি
 function init() {
     setupBillingDate();
     const container = document.getElementById("tenantAccordion");
@@ -143,29 +215,31 @@ function init() {
         const card = document.createElement("div");
         card.className = "tenant-card";
         card.innerHTML = `
-<div class="summary-header" onclick="togglePanel('${t.id}')">
-<span>[FLAT: ${t.id}]</span><span id="label-${t.id}" class="header-stats">ডাটা ইনপুট করুন...</span>
-</div>
-<div class="details-panel" id="panel-${t.id}">
-<div class="accord-grid">
-<div class="input-group"><label>পূর্বের মিটার রিডিং:</label><input type="number" id="prevM-${t.id}" value="${t.prevMeter}"></div>
-<div class="input-group"><label>বর্তমান মিটার রিডিং:</label><input type="number" id="currM-${t.id}" value="0"></div>
-<div class="input-group"><label>ভাড়া:</label><input type="number" id="rent-${t.id}" value="${t.rent}"></div>
-<div class="input-group"><label>সার্ভিস:</label><input type="number" id="gas-${t.id}" value="${t.gas + t.service}"></div>
-<div class="input-group"><label>গত মাসের পাওনা:</label><input type="number" id="lastTotal-${t.id}" value="${t.totalLastMonth}"></div>
-<div class="input-group"><label>গত মাসের জমা:</label><input type="number" id="lastPaid-${t.id}" value="0"></div>
-</div>
-<div style="flex-basis: 100%; width: 100%; text-align: center; margin-top: 15px;">
-<button type="button" class="btn-clear" onclick="clearTenantBalance('${t.id}')"
-style="background: #800000; color: #f2f2f2; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 98%; font-weight: bold; font-size: 13px;">
-নতুন ভাড়াটিয়া (ব্যালেন্স ০ করুন)
-</button>
-</div>
-</div>`;
+        <div class="summary-header" onclick="togglePanel('${t.id}')">
+            <span>[FLAT: ${t.id}]</span><span id="label-${t.id}" class="header-stats">ডাটা ইনপুট করুন...</span>
+        </div>
+        <div class="details-panel" id="panel-${t.id}">
+            <div class="accord-grid">
+                <div class="input-group"><label>পূর্বের মিটার রিডিং:</label><input type="number" id="prevM-${t.id}" value="${t.prevMeter}"></div>
+                <div class="input-group"><label>বর্তমান মিটার রিডিং:</label><input type="number" id="currM-${t.id}" value="0"></div>
+                <div class="input-group"><label>ভাড়া:</label><input type="number" id="rent-${t.id}" value="${t.rent}"></div>
+                <div class="input-group"><label>সার্ভিস:</label><input type="number" id="gas-${t.id}" value="${t.gas + t.service}"></div>
+                <div class="input-group"><label>গত মাসের পাওনা:</label><input type="number" id="lastTotal-${t.id}" value="${t.totalLastMonth}"></div>
+                <div class="input-group"><label>গত মাসের জমা:</label><input type="number" id="lastPaid-${t.id}" value="0"></div>
+            </div>
+            <div class="accord-btn">
+                <button type="button" class="btn-clear" onclick="clearTenantBalance('${t.id}')">
+                    নতুন ভাড়াটিয়া (ব্যালেন্স ০ করুন)
+                </button>
+                <button type="button" class="btn-paid" onclick="saveDepositEntry('${t.id}')">
+                    জমা টাকা সেভ করুন 💰 
+                </button>
+            </div>
+        </div>`;
         container.appendChild(card);
     });
 }
-// ৭. অ্যাকর্ডিয়ন টগল
+
 function togglePanel(id) {
     const allPanels = document.querySelectorAll('.details-panel');
     const targetPanel = document.getElementById(`panel-${id}`);
@@ -177,13 +251,18 @@ function togglePanel(id) {
     targetPanel.classList.toggle('active');
 }
 
-// ৮. ক্যালকুলেশন এবং ডাটা সেভ (সিকিউর ভার্সন)
+// ==========================================
+// ৬. মেইন ক্যালকুলেশন ও সেভ (লোডার সহ)
+// ==========================================
+
 async function calculateAll() {
     if (!confirm("আপনি কি নিশ্চিত যে হিসাব সেভ করতে চান?")) return;
 
     const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
     localStorage.setItem("globalUnitRate", rate);
-    const pin = document.getElementById("pin-input").value; // পিন ইনপুট বক্স থেকে নিচ্ছে
+    const pin = document.getElementById("pin-input").value;
+
+    showGlobalLoader("সব ফ্ল্যাটের হিসাব তৈরি ও সেভ হচ্ছে...");
 
     const syncData = [];
     const month = currentSelectedMonth;
@@ -213,11 +292,11 @@ async function calculateAll() {
             rent,
             service: serv,
             dues,
+            paid: lPad,
             total
         });
     });
 
-    // সার্ভারে ডাটা পাঠানো
     try {
         await fetch(SHEET_URL, {
             method: "POST",
@@ -230,32 +309,106 @@ async function calculateAll() {
                 data: syncData
             })
         });
-        alert("হিসাব সম্পন্ন এবং সার্ভারে সেভ হয়েছে!");
 
-        //রিসেট লাস্ট ইনপুট
+        // সাকসেস মেসেজ লোডারে দেখাবে
+        showGlobalLoader("✅ হিসাব সম্পন্ন এবং সার্ভারে সেভ হয়েছে!");
+        await new Promise(resolve => setTimeout(resolve, 1500)); // ১.৫ সেকেন্ড দেখাবে
+
         if (document.getElementById("btn-undo")) {
             document.getElementById("btn-undo").style.display = "inline-block";
         }
     } catch (e) {
         console.error("Save Error:", e);
         alert("সার্ভার এরর! ইন্টারনেট কানেকশন চেক করুন।");
+    } finally {
+        hideGlobalLoader();
     }
 }
 
-// ৯. ভাড়াটিয়া রিসেট ও ব্যাকআপ লজিক
+// ==========================================
+// ৭. জমা এন্ট্রি (Individual Deposit)
+// ==========================================
 
-function clearTenantBalance(id) {
-    if (confirm(`ফ্ল্যাট ${id}-এর গত মাসের বকেয়া ও জমা কি শূন্য করতে চান?`)) {
-        document.getElementById(`lastTotal-${id}`).value = 0;
-        document.getElementById(`lastPaid-${id}`).value = 0;
-        // হেডারে লাল রঙে মেসেজ দেখাবে যাতে ভুল না হয়
-        document.getElementById(`label-${id}`).innerHTML = "<b style='color:#ff4d4d;'>রিসেট করা হয়েছে (সেভ করতে ভুলবেন না)!</b>";
+async function saveDepositEntry(targetId) {
+    const pin = document.getElementById("pin-input").value;
+    if (!pin) {
+        alert("আগে পিন নম্বর দিন!");
+        return;
+    }
+
+    const paidAmount = document.getElementById(`lastPaid-${targetId}`).value;
+    if (!confirm(`ফ্ল্যাট ${targetId}-এর জমা: ৳${paidAmount} সেভ করতে চাচ্ছেন?`)) return;
+
+    // --- বাটন সেফটি পার্ট ---
+    const btn = document.querySelector(`button[onclick="saveDepositEntry('${targetId}')"]`);
+    let originalText = "";
+    if (btn) {
+        originalText = btn.innerText;
+        btn.innerText = "⏳...";
+        btn.disabled = true;
+    }
+
+    // লোডার চালু
+    showGlobalLoader(`ফ্ল্যাট ${targetId} এর জমা লিপিবদ্ধ হচ্ছে...`);
+
+    const syncData = [];
+    const month = currentSelectedMonth;
+
+    tenantIDs.forEach((id) => {
+        syncData.push({
+            id: id,
+            month: month,
+            prevM: document.getElementById(`prevM-${id}`).value,
+            currM: document.getElementById(`currM-${id}`).value,
+            units: 0,
+            eBill: 0,
+            rent: document.getElementById(`rent-${id}`).value,
+            service: document.getElementById(`gas-${id}`).value,
+            dues: document.getElementById(`lastTotal-${id}`).value,
+            paid: document.getElementById(`lastPaid-${id}`).value,
+            total: 0
+        });
+    });
+
+    try {
+        await fetch(SHEET_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                pin: pin,
+                data: syncData
+            })
+        });
+
+        // সাকসেস মেসেজ লোডারে
+        showGlobalLoader(`✅ ফ্ল্যাট ${targetId}-এর টাকা জমা সাকসেসফুল!`);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+    } catch (e) {
+        console.error(e);
+        alert("সার্ভার কানেকশন এরর!");
+    } finally {
+        // --- বাটন ও লোডার রিলিজ ---
+        if (btn) {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+        hideGlobalLoader();
     }
 }
 
-// সব ডাটা একবারে ফাইল হিসেবে ডাউনলোড করা
+// ==========================================
+// ৮. ব্যাকআপ ও রিস্টোর (লোডার সহ)
+// ==========================================
+
 async function downloadBackup() {
     if (!confirm("আপনি কি সব মাসের ব্যাকআপ ডাটা ডাউনলোড করতে চান?")) return;
+
+    showGlobalLoader("ব্যাকআপ ফাইল তৈরি হচ্ছে...");
+
     try {
         const response = await fetch(`${SHEET_URL}?action=getAllData`);
         const data = await response.json();
@@ -269,12 +422,18 @@ async function downloadBackup() {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+        // ডাউনলোড শুরু হলে মেসেজ
+        showGlobalLoader("✅ ডাউনলোড শুরু হয়েছে...");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
     } catch (e) {
-        alert("ডাউনলোড এরর! সার্ভার থেকে ডাটা পাওয়া যায়নি।");
+        alert("ডাউনলোড এরর! সার্ভার থেকে ডাটা পাওয়া যায়নি।");
+    } finally {
+        hideGlobalLoader();
     }
 }
 
-// ফাইল থেকে ডাটা নিয়ে সার্ভারে ইমপোর্ট/আপলোড করা
 function importData(input) {
     const file = input.files[0];
     if (!file) return;
@@ -283,11 +442,11 @@ function importData(input) {
     reader.onload = async function(e) {
         try {
             const backupData = JSON.parse(e.target.result);
-            if (!confirm(`ফাইলে ${backupData.length} টি এন্ট্রি পাওয়া গেছে। এগুলো কি সার্ভারে আপলোড করবেন?`)) return;
+            if (!confirm(`ফাইলে ${backupData.length} টি এন্ট্রি পাওয়া গেছে। আপলোড করবেন?`)) return;
 
             const pin = document.getElementById("pin-input").value;
+            showGlobalLoader("ব্যাকআপ ডাটা সার্ভারে আপলোড হচ্ছে...");
 
-            // ডাটা সরাসরি সার্ভারে পাঠানো (কোনো রিক্যালকুলেশন ছাড়া)
             await fetch(SHEET_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -300,42 +459,63 @@ function importData(input) {
                 })
             });
 
-            alert("ব্যাকআপ ডাটা সফলভাবে আপলোড হয়েছে! আপডেট দেখতে পেজটি রিলোড দিন।");
+            // সাকসেস মেসেজ ও রিলোড
+            showGlobalLoader("✅ ব্যাকআপ আপলোড সম্পন্ন! পেজ রিলোড হচ্ছে...");
+            await new Promise(resolve => setTimeout(resolve, 2000)); // ২ সেকেন্ড দেখাবে
             location.reload();
+
         } catch (err) {
-            alert("ভুল ফাইল ফরম্যাট! দয়া করে সঠিক JSON ব্যাকআপ ফাইল দিন।");
+            hideGlobalLoader();
+            alert("ভুল ফাইল ফরম্যাট বা আপলোড এরর!");
         }
     };
     reader.readAsText(file);
 }
 
+// ==========================================
+// ৯. রিসেট ফাংশনস (লোডার সহ)
+// ==========================================
 
-// ১০. সার্ভার অ্যাকশনস (রিসেট ও ডিলিট)
+function clearTenantBalance(id) {
+    if (confirm(`ফ্ল্যাট ${id}-এর গত মাসের বকেয়া ও জমা কি শূন্য করতে চান?`)) {
+        document.getElementById(`lastTotal-${id}`).value = 0;
+        document.getElementById(`lastPaid-${id}`).value = 0;
+        document.getElementById(`label-${id}`).innerHTML = "<b style='color:#ff4d4d;'>রিসেট করা হয়েছে (সেভ করতে ভুলবেন না)!</b>";
+    }
+}
 
 async function resetLastInput() {
     const month = currentSelectedMonth;
     const pin = document.getElementById("pin-input").value;
 
-    if (!confirm(getBnMonthName(month) + " মাসের সব ডাটা শিট থেকে মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না।")) return;
+    if (!confirm(getBnMonthName(month) + " মাসের সব ডাটা শিট থেকে মুছে ফেলতে চান?")) return;
+
+    showGlobalLoader("ডাটা মোছা হচ্ছে...");
 
     try {
         const response = await fetch(`${SHEET_URL}?action=deleteLast&month=${month}&pin=${pin}`);
         const result = await response.text();
 
         if (result === "Success") {
-            alert("ডাটা সফলভাবে মোছা হয়েছে। পেজ রিফ্রেশ হচ্ছে...");
+            showGlobalLoader("✅ ডাটা সফলভাবে মোছা হয়েছে। রিলোড হচ্ছে...");
+            await new Promise(resolve => setTimeout(resolve, 2000));
             window.location.reload();
         } else if (result === "Unauthorized") {
+            hideGlobalLoader();
             alert("ভুল পিন! ডাটা মোছার অনুমতি নেই।");
         } else {
+            hideGlobalLoader();
             alert("এরর: " + result);
         }
     } catch (e) {
-        alert("সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না। আপনার ইন্টারনেট চেক করুন।");
+        hideGlobalLoader();
+        alert("সার্ভার এরর!");
     }
 }
 
-// ১১. হেল্পার ফাংশনস (তারিখ ও বাংলা নম্বর)
+// ==========================================
+// ১০. হেল্পার ও প্রিন্ট লজিক
+// ==========================================
 
 function getPreviousMonth(currentMonthStr) {
     const date = new Date(currentMonthStr + "-01");
@@ -353,11 +533,10 @@ function getBnMonthName(str) {
 }
 
 function enToBnNumber(n) {
+    if (n === undefined || n === null) return "০";
     const bn = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
     return n.toString().replace(/\d/g, (d) => bn[d]);
 }
-
-// ১২. ডায়নামিক তারিখ ও মাস কন্ট্রোল
 
 function setupBillingDate() {
     const cal = document.getElementById("billingMonth");
@@ -385,7 +564,6 @@ function renderDynamicDateControls() {
     const container = document.getElementById("dynamicDateContainer");
     const now = new Date();
     const curYear = now.getFullYear();
-
     let html = `<select id="billingMonth_Year" onchange="updateSelectedYear(this.value)">`;
     for (let i = curYear; i >= 2015; i--) {
         const isSelected = currentSelectedMonth.split('-')[0] == i ? "selected" : "";
@@ -398,7 +576,6 @@ function renderDynamicDateControls() {
 function updateMonthOptions() {
     const container = document.getElementById("monthDropdownContainer");
     const names = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
-
     const now = new Date();
     const curYear = now.getFullYear();
     const curMonth = now.getMonth();
@@ -408,10 +585,7 @@ function updateMonthOptions() {
     names.forEach((name, i) => {
         const val = (i + 1).toString().padStart(2, "0");
         const isSelected = currentSelectedMonth.split('-')[1] == val ? "selected" : "";
-
-        // লজিক: বর্তমান বছরের বর্তমান মাসের পরের মাসগুলো ডিজেবল থাকবে
         let isDisabled = (selectedYear === curYear && i > curMonth) ? "disabled" : "";
-
         html += `<option value="${val}" ${isSelected} ${isDisabled}>${name}</option>`;
     });
     container.innerHTML = html + `</select>`;
@@ -429,11 +603,10 @@ function updateSelectedMonth(month) {
     handleMonthChange();
 }
 
-// ১৩. প্রিন্ট ভিউ (পুরোপুরি গিটহাব স্টাইলে)
 function generatePrintView() {
     const selDate = currentSelectedMonth;
     const formattedMonth = getBnMonthName(selDate);
-    const targetMonthName = formattedMonth.split(" ")[0]; // মাসের নাম (যেমন: জানুয়ারি)
+    const targetMonthName = formattedMonth.split(" ")[0];
 
     let printArea = document.querySelector(".print-only") || document.createElement("div");
     printArea.className = "print-only";
@@ -445,15 +618,15 @@ function generatePrintView() {
 
     const style = document.createElement('style');
     style.innerHTML = `
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
-@media print {
-@page { margin: ${printMargin} !important; }
-* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-.bill-cell { font-family: 'Noto Sans Bengali', sans-serif; line-height: 1.2; color: #000; padding: 5px; border: 1px solid #ccc; }
-.bill-cell h4 { margin: 0 0 2px 0; font-size: 16px; font-weight: 500; text-align: center; border-bottom: 2px solid #000; padding-bottom: 3px; }
-.bill-cell p { margin: 3px 0; font-size: 14px; font-weight: 500; display: flex; }
-.total-row { font-size: 15px !important; font-weight: 700 !important; border-top: 2px dashed #000 !important; margin-top: 6px !important; padding-top: 8px; }
-}`;
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+    @media print {
+        @page { margin: ${printMargin} !important; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        .bill-cell { font-family: 'Noto Sans Bengali', sans-serif; line-height: 1.2; color: #000; padding: 5px; border: 1px solid #ccc; }
+        .bill-cell h4 { margin: 0 0 2px 0; font-size: 16px; font-weight: 500; text-align: center; border-bottom: 2px solid #000; padding-bottom: 3px; }
+        .bill-cell p { margin: 3px 0; font-size: 14px; font-weight: 500; display: flex; }
+        .total-row { font-size: 15px !important; font-weight: 700 !important; border-top: 2px dashed #000 !important; margin-top: 6px !important; padding-top: 8px; }
+    }`;
     document.head.appendChild(style);
 
     const chunks = [tenantIDs.slice(0, 9), tenantIDs.slice(9, 18)];
@@ -478,20 +651,20 @@ function generatePrintView() {
             const total = eBill + rent + serv + dues;
 
             html += `
-<div class="bill-cell">
-<h4>${enToBnNumber(id)} (${formattedMonth}) এর জন্যঃ</h4>
-<p>মাস শেষের মিটার রিডিং: ${enToBnNumber(curr)}</p>
-<p>মাস শুরুর মিটার রিডিং: ${enToBnNumber(prev)}</p>
-<p>ব্যবহৃত ইউনিট: ${enToBnNumber(units.toFixed(0))}</p>
-<p><strong>বিদ্যুৎ বিল (${enToBnNumber(rate)}৳ হারে): ${enToBnNumber(eBill.toFixed(0))}/-</strong></p>
-<p>মাসিক ভাড়া: ${enToBnNumber(rent)}/-</p>
-<p>${id === "6B" ? "গ্যাস বিল ও সিঁড়ি ঝাড়ু" : "সিঁড়ি ঝাড়ু"}: ${enToBnNumber(serv)}/-</p>
-<p><strong>${targetMonthName} মাসের বকেয়া: ${enToBnNumber(dues.toFixed(0))}৳</strong></p>
-<p class="total-row"><strong>এই মাসে মোট পাওনা: ${enToBnNumber(total.toFixed(0))}৳</strong></p>
-<div style="margin-top:10px; font-size:12px; border-top:1px solid #000; padding-top:6px; text-align: center; line-height: 1.3;">
-<strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বার: 01944529442 রেফারেন্স (Ref): ${id}</strong>
-</div>
-</div>`;
+            <div class="bill-cell">
+            <h4>${enToBnNumber(id)} (${formattedMonth}) এর জন্যঃ</h4>
+            <p>মাস শেষের মিটার রিডিং: ${enToBnNumber(curr)}</p>
+            <p>মাস শুরুর মিটার রিডিং: ${enToBnNumber(prev)}</p>
+            <p>ব্যবহৃত ইউনিট: ${enToBnNumber(units.toFixed(0))}</p>
+            <p><strong>বিদ্যুৎ বিল (${enToBnNumber(rate)}৳ হারে): ${enToBnNumber(eBill.toFixed(0))}/-</strong></p>
+            <p>মাসিক ভাড়া: ${enToBnNumber(rent)}/-</p>
+            <p>${id === "6B" ? "গ্যাস বিল ও সিঁড়ি ঝাড়ু" : "সিঁড়ি ঝাড়ু"}: ${enToBnNumber(serv)}/-</p>
+            <p><strong>${targetMonthName} মাসের বকেয়া: ${enToBnNumber(dues.toFixed(0))}৳</strong></p>
+            <p class="total-row"><strong>এই মাসে মোট পাওনা: ${enToBnNumber(total.toFixed(0))}৳</strong></p>
+            <div style="margin-top:10px; font-size:12px; border-top:1px solid #000; padding-top:6px; text-align: center; line-height: 1.3;">
+            <strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বার: 01944529442 রেফারেন্স (Ref): ${id}</strong>
+            </div>
+            </div>`;
         });
         html += `</div>`;
         pageDiv.innerHTML = html;
@@ -499,8 +672,3 @@ function generatePrintView() {
     });
     window.print();
 }
-
-window.onload = () => {
-    if (document.getElementById('pin-input')) document.getElementById('pin-input').focus();
-};
-
