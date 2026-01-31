@@ -503,7 +503,86 @@ button:hover {
 		grid-template-columns: 1fr !important;
 	}
 }
+/* নতুন অ্যাডভান্স বাটন স্টাইল */
+.btn-advance {
+  background: #ffcc00; /* হলুদ রঙ */
+  color: #000;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+  width: 100%;
+  transition: 0.3s;
+}
+.btn-advance:hover { background: #e6b800; }
 
+/* মডাল ওভারলে (ব্যাকগ্রাউন্ড) */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* মডাল বক্স */
+.modal-content {
+  background: #1a1a24;
+  padding: 25px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  border: 1px solid var(--neon-green);
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+/* ক্লোজ বাটন (X) */
+.close-modal {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 25px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.info-box {
+  background: #2a2a35;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+}
+.info-box span { color: #ffcc00; }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+.modal-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn-save-adv { background: #28a745; color: white; }
+.btn-deduct-adv { background: #d63384; color: white; }
+
+/* মোবাইল রেসপন্সিভ বাটন ফিক্স (আগের CSS এর সাথে মিল রেখে) */
+@media (max-width: 600px) {
+    .accord-btn { flex-direction: column-reverse; gap: 8px; }
+}
 /* --- Print View (ক্লিন এবং নিচে নিচে লিস্ট) --- */
 @media print {
 	@page {
@@ -724,5 +803,6 @@ button:hover {
 		align-items: start !important;
 	}
 }
+
 
 
