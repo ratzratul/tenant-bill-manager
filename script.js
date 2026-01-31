@@ -538,10 +538,10 @@ async function resetLastInput() {
 }
 
 // ==========================================
-// ১০. Advance lojic and function
+// ১০. Advance logic and function
 // ==========================================
 
-let currentAdvanceId = null; // গ্লোবাল ভেরিয়েবল টার্গেট ফ্ল্যাট মনে রাখার জন্য
+let currentAdvanceId = null; 
 
 // ১. মডাল ওপেন করা এবং ডাটা ফেচ করা
 async function openAdvanceModal(id) {
@@ -549,22 +549,16 @@ async function openAdvanceModal(id) {
     document.getElementById("adv-modal-id").innerText = id;
     document.getElementById("new-advance-input").value = "";
     
-    // লোডার দেখান
     showGlobalLoader("অ্যাডভান্স ব্যালেন্স চেক করা হচ্ছে...");
 
     try {
-        // GET রিকোয়েস্টে সাধারণত পিন লাগে না (আপনার স্ক্রিপ্ট অনুযায়ী), তাই এখানে পিন যোগ করা হয়নি
         const response = await fetch(`${SHEET_URL}?action=getAdvance&id=${id}`);
         const data = await response.json();
         
-        // ডাটা সেট করা
         document.getElementById("current-advance-display").innerText = data.amount || 0;
-        
-        // মডাল দেখানো
         document.getElementById("advanceModal").style.display = "flex";
     } catch (e) {
-        alert("ডাটা লোড করা যায়নি!");
-        console.error(e);
+        alert("অ্যাডভান্স ডাটা লোড করা যায়নি!");
     } finally {
         hideGlobalLoader();
     }
@@ -575,9 +569,8 @@ function closeAdvanceModal() {
     document.getElementById("advanceModal").style.display = "none";
 }
 
-// ৩. নতুন অ্যাডভান্স সেভ করা (পিন সহ)
+// ৩. নতুন অ্যাডভান্স সেভ করা
 async function saveAdvanceData() {
-    // পিন চেক করা
     const pin = document.getElementById("pin-input").value;
     if (!pin) { alert("আগে পিন নম্বর দিন!"); return; }
 
@@ -587,27 +580,22 @@ async function saveAdvanceData() {
     showGlobalLoader("অ্যাডভান্স সেভ হচ্ছে...");
 
     try {
+        // mode: "no-cors" সরালাম কারণ এতে সাকসেস বোঝা যায় না
         await fetch(SHEET_URL, {
             method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                pin: pin, // <--- পিন পাঠানো হচ্ছে
+                pin: pin,
                 action: "updateAdvance",
                 id: currentAdvanceId, 
-                data: [], // ফরম্যালিটি মেইনটেইন
                 amount: amount 
             })
         });
 
-        // UI আপডেট
         document.getElementById("current-advance-display").innerText = amount;
         document.getElementById("new-advance-input").value = "";
         
-        // সাকসেস মেসেজ লোডারে
-        showGlobalLoader("✅ অ্যাডভান্স সেভ হয়েছে!");
-        await new Promise(r => setTimeout(r, 1000));
-
+        showGlobalLoader("✅ অ্যাডভান্স সেভ হয়েছে!");
+        await new Promise(r => setTimeout(r, 1200));
     } catch (e) {
         alert("সেভ এরর!");
     } finally {
@@ -615,59 +603,62 @@ async function saveAdvanceData() {
     }
 }
 
-// ৪. অ্যাডভান্স টাকা বিল থেকে কেটে নেওয়া (পিন সহ)
+// ৪. অ্যাডভান্স টাকা বিল থেকে কেটে নেওয়া (সম্পূর্ণ ফিক্সড লজিক)
 async function deductFromTotal() {
-    // পিন চেক করা
     const pin = document.getElementById("pin-input").value;
     if (!pin) { alert("আগে পিন নম্বর দিন!"); return; }
 
     const advanceAmount = parseFloat(document.getElementById("current-advance-display").innerText);
-    
     if (advanceAmount <= 0) {
         alert("কাটার মতো কোনো অ্যাডভান্স টাকা নেই!");
         return;
     }
 
-    if(!confirm(`আপনি কি টোটাল বিল থেকে ${advanceAmount} টাকা কমাতে চান? এর ফলে অ্যাডভান্স ০ হয়ে যাবে।`)) return;
+    if(!confirm(`আপনি কি মোট বিল থেকে ৳${advanceAmount} কমাতে চান?`)) return;
 
-    // মেইন UI তে টোটাল বিল ধরা
-    const totalEl = document.getElementById(`total-${currentAdvanceId}`); // ডিটেইলস প্যানেলের ইনপুট
-    const headerTotalEl = document.getElementById(`h-total-${currentAdvanceId}`); // হেডার
-    
-    let currentTotal = parseFloat(totalEl.value) || 0;
-    
-    // ক্যালকুলেশন: টোটাল থেকে অ্যাডভান্স বাদ
-    let newTotal = currentTotal - advanceAmount;
-    if (newTotal < 0) newTotal = 0; // বিল নেগেটিভ না হওয়া ভালো
-
-    // ১. UI আপডেট (তাৎক্ষণিক)
-    totalEl.value = newTotal;
-    if(headerTotalEl) headerTotalEl.innerText = newTotal;
-
-    // ২. সার্ভারে অ্যাডভান্স ০ করে দেওয়া
-    showGlobalLoader("বিল অ্যাডজাস্ট করা হচ্ছে...");
+    showGlobalLoader("বিল অ্যাডজাস্ট ও সেভ করা হচ্ছে...");
 
     try {
+        // ১. সার্ভারে অ্যাডভান্স ০ করে দেওয়া
         await fetch(SHEET_URL, {
             method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                pin: pin, // <--- পিন পাঠানো হচ্ছে
+                pin: pin,
                 action: "updateAdvance",
                 id: currentAdvanceId, 
-                amount: 0 // অ্যাডভান্স এখন জিরো
+                amount: 0 
             })
         });
 
+        // ২. UI তে অ্যাডভান্সের ভ্যালু ব্যবহার করে ক্যালকুলেশন
+        const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
+        const curr = parseFloat(document.getElementById(`currM-${currentAdvanceId}`).value) || 0;
+        const prev = parseFloat(document.getElementById(`prevM-${currentAdvanceId}`).value) || 0;
+        const rent = parseFloat(document.getElementById(`rent-${currentAdvanceId}`).value) || 0;
+        const serv = parseFloat(document.getElementById(`gas-${currentAdvanceId}`).value) || 0;
+        const lTot = parseFloat(document.getElementById(`lastTotal-${currentAdvanceId}`).value) || 0;
+        const lPad = parseFloat(document.getElementById(`lastPaid-${currentAdvanceId}`).value) || 0;
+
+        const units = curr - prev;
+        const eBill = (units * rate).toFixed(0);
+        const dues = (lTot - lPad).toFixed(0);
+        
+        // অ্যাডভান্স মাইনাস করে নতুন টোটাল
+        const baseTotal = parseFloat(eBill) + rent + serv + parseFloat(dues);
+        const finalTotal = (baseTotal - advanceAmount).toFixed(0);
+
+        // ৩. হেডার লেবেল আপডেট করা (সবচেয়ে গুরুত্বপূর্ণ)
+        updateHeaderLabel(currentAdvanceId, units, eBill, dues, finalTotal);
+
+        // ৪. শেষ ধাপ: UI আপডেট ও মডাল বন্ধ
         document.getElementById("current-advance-display").innerText = "0";
         closeAdvanceModal();
         
-        showGlobalLoader(`✅ বিল কমিয়ে ${newTotal} করা হয়েছে এবং অ্যাডভান্স ০ হয়েছে।`);
+        showGlobalLoader(`✅ বিল থেকে ৳${advanceAmount} কমিয়ে মোট ৳${finalTotal} করা হয়েছে।`);
         await new Promise(r => setTimeout(r, 1500));
 
     } catch (e) {
-        alert("কানেকশন এরর!");
+        alert("কানেকশন এরর! অ্যাডজাস্টমেন্ট সম্পন্ন হয়নি।");
     } finally {
         hideGlobalLoader();
     }
@@ -831,6 +822,7 @@ function generatePrintView() {
     });
     window.print();
 }
+
 
 
 
