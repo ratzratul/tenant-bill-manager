@@ -614,12 +614,12 @@ async function deductFromTotal() {
         return;
     }
 
-    if(!confirm(`আপনি কি মোট বিল থেকে ৳${advanceAmount} কমাতে চান?`)) return;
+    if(!confirm(`আপনি কি মোট বিল থেকে ৳${advanceAmount} কমাতে চান? এটি স্বয়ংক্রিয়ভাবে সার্ভারে সেভ হবে।`)) return;
 
-    showGlobalLoader("বিল অ্যাডজাস্ট ও সেভ করা হচ্ছে...");
+    showGlobalLoader("অ্যাডভান্স অ্যাডজাস্ট ও সার্ভারে সেভ হচ্ছে...");
 
     try {
-        // ১. সার্ভারে অ্যাডভান্স ০ করে দেওয়া
+        // ১. সার্ভারে অ্যাডভান্স ব্যালেন্স ০ করে দেওয়া
         await fetch(SHEET_URL, {
             method: "POST",
             body: JSON.stringify({ 
@@ -630,39 +630,42 @@ async function deductFromTotal() {
             })
         });
 
-        // ২. মেইন UI-তে ইনপুট বক্সের ভ্যালু আপডেট করা (যাতে প্রিন্ট এ সঠিক আসে)
-        // আমরা অ্যাডভান্সের টাকাটা 'lastPaid' (জমা) এর সাথে যোগ করে দিচ্ছি, 
-        // এতে অটোমেটিক বিল কমে যাবে এবং প্রিন্টে হিসাব মিলবে।
+        // ২. UI-তে 'lastPaid' ইনপুট বক্স আপডেট করা (যাতে প্রিন্ট ও সেভ এ সঠিক ভ্যালু যায়)
         const lastPaidEl = document.getElementById(`lastPaid-${currentAdvanceId}`);
         let currentPaid = parseFloat(lastPaidEl.value) || 0;
         lastPaidEl.value = currentPaid + advanceAmount;
 
-        // ৩. এবার পুরো হিসাবটা পুনরায় ক্যালকুলেট করে হেডার আপডেট করা
+        // ৩. অটোমেটিক সার্ভারে ওই ফ্ল্যাটের ডাটা সেভ করা (আপনার বিদ্যমান ফাংশন ব্যবহার করে)
+        // এটি কল করলে শিটে 'Paid' কলামে নতুন ভ্যালু বসে যাবে
+        await saveDepositEntry(currentAdvanceId);
+
+        // ৪. হেডার লেবেল আপডেট করার জন্য ভ্যালু ক্যালকুলেশন
         const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
         const curr = parseFloat(document.getElementById(`currM-${currentAdvanceId}`).value) || 0;
         const prev = parseFloat(document.getElementById(`prevM-${currentAdvanceId}`).value) || 0;
         const rent = parseFloat(document.getElementById(`rent-${currentAdvanceId}`).value) || 0;
         const serv = parseFloat(document.getElementById(`gas-${currentAdvanceId}`).value) || 0;
         const lTot = parseFloat(document.getElementById(`lastTotal-${currentAdvanceId}`).value) || 0;
-        const lPad = parseFloat(lastPaidEl.value) || 0; // নতুন আপডেটেড জমা
+        const lPad = parseFloat(lastPaidEl.value); 
 
         const units = curr - prev;
         const eBill = (units * rate).toFixed(0);
         const dues = (lTot - lPad).toFixed(0);
         const finalTotal = (parseFloat(eBill) + rent + serv + parseFloat(dues)).toFixed(0);
 
-        // ৪. হেডার লেবেল আপডেট
+        // ৫. হেডার আপডেট
         updateHeaderLabel(currentAdvanceId, units, eBill, dues, finalTotal);
 
-        // ৫. মডাল বন্ধ ও সাকসেস মেসেজ
+        // ৬. মডাল বন্ধ ও সাকসেস মেসেজ
         document.getElementById("current-advance-display").innerText = "0";
         closeAdvanceModal();
         
-        showGlobalLoader(`✅ বিল অ্যাডজাস্ট হয়েছে। এখন প্রিন্ট করলে সঠিক বিল আসবে।`);
+        showGlobalLoader(`✅ অ্যাডভান্স কাটা হয়েছে এবং সার্ভারে হিসাব আপডেট হয়েছে।`);
         await new Promise(r => setTimeout(r, 1500));
 
     } catch (e) {
-        alert("কানেকশন এরর!");
+        console.error(e);
+        alert("অটো-সেভ করার সময় সমস্যা হয়েছে। দয়া করে ম্যানুয়ালি সেভ বাটন চাপুন।");
     } finally {
         hideGlobalLoader();
     }
@@ -826,6 +829,7 @@ function generatePrintView() {
     });
     window.print();
 }
+
 
 
 
