@@ -111,7 +111,6 @@ async function handleMonthChange() {
     const selectedMonth = currentSelectedMonth;
     const pin = document.getElementById("pin-input").value;
 
-    // লোডার চালু
     showGlobalLoader("সার্ভার থেকে ডাটা লোড করা হচ্ছে...");
 
     try {
@@ -120,32 +119,31 @@ async function handleMonthChange() {
 
         if (currentData && currentData.length > 0) {
             renderDataToUI(currentData);
-            // ডাটা পাওয়া গেলে সরাসরি লোডার বন্ধ, কোনো মেসেজ/অ্যালার্ট দরকার নেই
         } else {
-            // কারেন্ট মাসে ডাটা না থাকলে মেসেজ আপডেট
-            showGlobalLoader("বর্তমান ডাটা নেই! আগের মাসের রিডিং খোঁজা হচ্ছে...");
+            // যদি কারেন্ট মাসে ডাটা না থাকে
+            showGlobalLoader("বর্তমান ডাটা নেই! আগের মাসের ডাটা খোঁজা হচ্ছে...");
 
             const prevMonth = getPreviousMonth(selectedMonth);
             const prevResponse = await fetch(`${SHEET_URL}?action=getMonthData&month=${prevMonth}&pin=${pin}`);
             const prevData = await prevResponse.json();
 
             if (prevData && prevData.length > 0) {
+                // এখানে আগের মাসের রিডিং, ভাড়া এবং সার্ভিস চার্জ - সবই নিয়ে আসবে
                 populateFromPrevious(prevData);
-                // ইউজারকে পড়ার সময় দেওয়ার জন্য ১.৫ সেকেন্ড অপেক্ষা
-                showGlobalLoader(`${getBnMonthName(prevMonth)} মাসের রিডিং অটোমেটিক বসানো হয়েছে...`);
+                showGlobalLoader(`${getBnMonthName(prevMonth)} মাসের রিডিং ও ভাড়া অটোমেটিক বসানো হয়েছে...`);
                 await new Promise(resolve => setTimeout(resolve, 1500));
             } else {
+                // যদি আগের মাসেও ডাটা না থাকে, তবেই হার্ডকোডেড ডিফল্ট বসাবে
                 resetToDefaults();
-                // ডিফল্ট ভ্যালু সেট করার মেসেজ
                 showGlobalLoader("কোনো পূর্ববর্তী ডাটা পাওয়া যায়নি। ডিফল্ট সেট করা হচ্ছে...");
                 await new Promise(resolve => setTimeout(resolve, 1500));
             }
         }
     } catch (e) {
         console.error("Load Error:", e);
-        alert("ডাটা লোড করতে সমস্যা হয়েছে। ইন্টারনেট চেক করুন।"); // শুধু এরর হলে অ্যালার্ট থাকবে
+        alert("ডাটা লোড করতে সমস্যা হয়েছে।");
     } finally {
-        hideGlobalLoader(); // কাজ শেষ
+        hideGlobalLoader();
     }
 }
 
@@ -173,12 +171,30 @@ function renderDataToUI(data) {
 }
 
 function populateFromPrevious(prevData) {
-    resetToDefaults();
+    // আগে সব ক্লিয়ার করে নেয়া ভালো
+    resetToDefaults(); 
+    
     prevData.forEach(row => {
         const id = row.id;
-        if (document.getElementById(`prevM-${id}`)) document.getElementById(`prevM-${id}`).value = row.currM;
-        if (document.getElementById(`lastTotal-${id}`)) document.getElementById(`lastTotal-${id}`).value = row.total;
-        if (document.getElementById(`label-${id}`)) document.getElementById(`label-${id}`).innerHTML = "নতুন ডাটা ইনপুট দিন...";
+        // ১. আগের মাসের কারেন্ট মিটার এই মাসের প্রিভিয়াস মিটার হবে
+        if (document.getElementById(`prevM-${id}`)) {
+            document.getElementById(`prevM-${id}`).value = row.currM;
+        }
+        // ২. আগের মাসের টোটাল বিল এই মাসের বকেয়া (Dues) হবে
+        if (document.getElementById(`lastTotal-${id}`)) {
+            document.getElementById(`lastTotal-${id}`).value = row.total;
+        }
+        // ৩. আগের মাসের ভাড়া এবং সার্ভিস চার্জ এই মাসেও বসবে
+        if (document.getElementById(`rent-${id}`)) {
+            document.getElementById(`rent-${id}`).value = row.rent;
+        }
+        if (document.getElementById(`gas-${id}`)) {
+            document.getElementById(`gas-${id}`).value = row.service;
+        }
+        
+        if (document.getElementById(`label-${id}`)) {
+            document.getElementById(`label-${id}`).innerHTML = "<span style='color: #008080;'>আগের মাসের ডাটা লোড হয়েছে...</span>";
+        }
     });
 }
 
@@ -188,11 +204,16 @@ function resetToDefaults() {
         if (document.getElementById(`currM-${id}`)) document.getElementById(`currM-${id}`).value = 0;
         if (document.getElementById(`lastTotal-${id}`)) document.getElementById(`lastTotal-${id}`).value = 0;
         if (document.getElementById(`lastPaid-${id}`)) document.getElementById(`lastPaid-${id}`).value = 0;
+        
+        // যদি ডাটাবেজে ডিফল্ট ভ্যালু থাকে (db[id])
         if (db[id]) {
             if (document.getElementById(`rent-${id}`)) document.getElementById(`rent-${id}`).value = db[id].rent;
             if (document.getElementById(`gas-${id}`)) document.getElementById(`gas-${id}`).value = db[id].gas + db[id].service;
         }
-        if (document.getElementById(`label-${id}`)) document.getElementById(`label-${id}`).innerHTML = "ডাটা ইনপুট করুন...";
+        
+        if (document.getElementById(`label-${id}`)) {
+            document.getElementById(`label-${id}`).innerHTML = "ডাটা ইনপুট করুন...";
+        }
     });
 }
 
@@ -810,5 +831,6 @@ function generatePrintView() {
     });
     window.print();
 }
+
 
 
