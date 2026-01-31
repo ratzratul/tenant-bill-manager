@@ -6,7 +6,7 @@
 const tenantIDs = ["1A", "1B", "1C", "1D", "2A", "2B", "2C", "2D", "4A", "4B", "4C", "4D", "5A", "5B", "5C", "5D", "6A", "6B"];
 let db = {};
 let savedUnitRate = localStorage.getItem("globalUnitRate") || "8.5";
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbzzjtXlK6mpX-nQsiKIHW72S9ddazW-lD-MPEesC6R9hyBbdGApJwxub1DVWXq76A1vYw/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzj7T_0yff2HPAs1xizbtyzoLnJxuREHH6dQPSZT6Sh00cr_R3xeB4TW4KsB7OaYB5hTA/exec";
 
 let currentSelectedMonth = "";
 let typeInterval; // টাইপিং এনিমেশনের জন্য
@@ -514,9 +514,144 @@ async function resetLastInput() {
 }
 
 // ==========================================
-// ১০. হেল্পার ও প্রিন্ট লজিক
+// ১০. Advance lojic and function
 // ==========================================
 
+let currentAdvanceId = null; // গ্লোবাল ভেরিয়েবল টার্গেট ফ্ল্যাট মনে রাখার জন্য
+
+// ১. মডাল ওপেন করা এবং ডাটা ফেচ করা
+async function openAdvanceModal(id) {
+    currentAdvanceId = id;
+    document.getElementById("adv-modal-id").innerText = id;
+    document.getElementById("new-advance-input").value = "";
+    
+    // লোডার দেখান
+    showGlobalLoader("অ্যাডভান্স ব্যালেন্স চেক করা হচ্ছে...");
+
+    try {
+        // GET রিকোয়েস্টে সাধারণত পিন লাগে না (আপনার স্ক্রিপ্ট অনুযায়ী), তাই এখানে পিন যোগ করা হয়নি
+        const response = await fetch(`${SHEET_URL}?action=getAdvance&id=${id}`);
+        const data = await response.json();
+        
+        // ডাটা সেট করা
+        document.getElementById("current-advance-display").innerText = data.amount || 0;
+        
+        // মডাল দেখানো
+        document.getElementById("advanceModal").style.display = "flex";
+    } catch (e) {
+        alert("ডাটা লোড করা যায়নি!");
+        console.error(e);
+    } finally {
+        hideGlobalLoader();
+    }
+}
+
+// ২. মডাল বন্ধ করা
+function closeAdvanceModal() {
+    document.getElementById("advanceModal").style.display = "none";
+}
+
+// ৩. নতুন অ্যাডভান্স সেভ করা (পিন সহ)
+async function saveAdvanceData() {
+    // পিন চেক করা
+    const pin = document.getElementById("pin-input").value;
+    if (!pin) { alert("আগে পিন নম্বর দিন!"); return; }
+
+    const amount = parseFloat(document.getElementById("new-advance-input").value);
+    if (isNaN(amount)) { alert("সঠিক টাকার পরিমাণ দিন!"); return; }
+
+    showGlobalLoader("অ্যাডভান্স সেভ হচ্ছে...");
+
+    try {
+        await fetch(SHEET_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                pin: pin, // <--- পিন পাঠানো হচ্ছে
+                action: "updateAdvance",
+                id: currentAdvanceId, 
+                data: [], // ফরম্যালিটি মেইনটেইন
+                amount: amount 
+            })
+        });
+
+        // UI আপডেট
+        document.getElementById("current-advance-display").innerText = amount;
+        document.getElementById("new-advance-input").value = "";
+        
+        // সাকসেস মেসেজ লোডারে
+        showGlobalLoader("✅ অ্যাডভান্স সেভ হয়েছে!");
+        await new Promise(r => setTimeout(r, 1000));
+
+    } catch (e) {
+        alert("সেভ এরর!");
+    } finally {
+        hideGlobalLoader();
+    }
+}
+
+// ৪. অ্যাডভান্স টাকা বিল থেকে কেটে নেওয়া (পিন সহ)
+async function deductFromTotal() {
+    // পিন চেক করা
+    const pin = document.getElementById("pin-input").value;
+    if (!pin) { alert("আগে পিন নম্বর দিন!"); return; }
+
+    const advanceAmount = parseFloat(document.getElementById("current-advance-display").innerText);
+    
+    if (advanceAmount <= 0) {
+        alert("কাটার মতো কোনো অ্যাডভান্স টাকা নেই!");
+        return;
+    }
+
+    if(!confirm(`আপনি কি টোটাল বিল থেকে ${advanceAmount} টাকা কমাতে চান? এর ফলে অ্যাডভান্স ০ হয়ে যাবে।`)) return;
+
+    // মেইন UI তে টোটাল বিল ধরা
+    const totalEl = document.getElementById(`total-${currentAdvanceId}`); // ডিটেইলস প্যানেলের ইনপুট
+    const headerTotalEl = document.getElementById(`h-total-${currentAdvanceId}`); // হেডার
+    
+    let currentTotal = parseFloat(totalEl.value) || 0;
+    
+    // ক্যালকুলেশন: টোটাল থেকে অ্যাডভান্স বাদ
+    let newTotal = currentTotal - advanceAmount;
+    if (newTotal < 0) newTotal = 0; // বিল নেগেটিভ না হওয়া ভালো
+
+    // ১. UI আপডেট (তাৎক্ষণিক)
+    totalEl.value = newTotal;
+    if(headerTotalEl) headerTotalEl.innerText = newTotal;
+
+    // ২. সার্ভারে অ্যাডভান্স ০ করে দেওয়া
+    showGlobalLoader("বিল অ্যাডজাস্ট করা হচ্ছে...");
+
+    try {
+        await fetch(SHEET_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                pin: pin, // <--- পিন পাঠানো হচ্ছে
+                action: "updateAdvance",
+                id: currentAdvanceId, 
+                amount: 0 // অ্যাডভান্স এখন জিরো
+            })
+        });
+
+        document.getElementById("current-advance-display").innerText = "0";
+        closeAdvanceModal();
+        
+        showGlobalLoader(`✅ বিল কমিয়ে ${newTotal} করা হয়েছে এবং অ্যাডভান্স ০ হয়েছে।`);
+        await new Promise(r => setTimeout(r, 1500));
+
+    } catch (e) {
+        alert("কানেকশন এরর!");
+    } finally {
+        hideGlobalLoader();
+    }
+}
+
+// ==========================================
+// 11. হেল্পার ও প্রিন্ট লজিক
+// ==========================================
 function getPreviousMonth(currentMonthStr) {
     const date = new Date(currentMonthStr + "-01");
     date.setMonth(date.getMonth() - 1);
@@ -672,3 +807,4 @@ function generatePrintView() {
     });
     window.print();
 }
+
