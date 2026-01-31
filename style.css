@@ -89,6 +89,7 @@ body {
 	background: #2f334d;
 	padding: 10px;
 	display: flex;
+	align-items: center;
 	gap: 8px;
 }
 
@@ -723,4 +724,5 @@ button:hover {
 		align-items: start !important;
 	}
 }
+
 
