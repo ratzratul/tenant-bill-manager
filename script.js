@@ -603,7 +603,7 @@ async function saveAdvanceData() {
     }
 }
 
-// ৪. অ্যাডভান্স টাকা বিল থেকে কেটে নেওয়া (সম্পূর্ণ ফিক্সড লজিক)
+// ৪. অ্যাডভান্স টাকা বিল থেকে কেটে নেওয়া 
 async function deductFromTotal() {
     const pin = document.getElementById("pin-input").value;
     if (!pin) { alert("আগে পিন নম্বর দিন!"); return; }
@@ -630,35 +630,39 @@ async function deductFromTotal() {
             })
         });
 
-        // ২. UI তে অ্যাডভান্সের ভ্যালু ব্যবহার করে ক্যালকুলেশন
+        // ২. মেইন UI-তে ইনপুট বক্সের ভ্যালু আপডেট করা (যাতে প্রিন্ট এ সঠিক আসে)
+        // আমরা অ্যাডভান্সের টাকাটা 'lastPaid' (জমা) এর সাথে যোগ করে দিচ্ছি, 
+        // এতে অটোমেটিক বিল কমে যাবে এবং প্রিন্টে হিসাব মিলবে।
+        const lastPaidEl = document.getElementById(`lastPaid-${currentAdvanceId}`);
+        let currentPaid = parseFloat(lastPaidEl.value) || 0;
+        lastPaidEl.value = currentPaid + advanceAmount;
+
+        // ৩. এবার পুরো হিসাবটা পুনরায় ক্যালকুলেট করে হেডার আপডেট করা
         const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
         const curr = parseFloat(document.getElementById(`currM-${currentAdvanceId}`).value) || 0;
         const prev = parseFloat(document.getElementById(`prevM-${currentAdvanceId}`).value) || 0;
         const rent = parseFloat(document.getElementById(`rent-${currentAdvanceId}`).value) || 0;
         const serv = parseFloat(document.getElementById(`gas-${currentAdvanceId}`).value) || 0;
         const lTot = parseFloat(document.getElementById(`lastTotal-${currentAdvanceId}`).value) || 0;
-        const lPad = parseFloat(document.getElementById(`lastPaid-${currentAdvanceId}`).value) || 0;
+        const lPad = parseFloat(lastPaidEl.value) || 0; // নতুন আপডেটেড জমা
 
         const units = curr - prev;
         const eBill = (units * rate).toFixed(0);
         const dues = (lTot - lPad).toFixed(0);
-        
-        // অ্যাডভান্স মাইনাস করে নতুন টোটাল
-        const baseTotal = parseFloat(eBill) + rent + serv + parseFloat(dues);
-        const finalTotal = (baseTotal - advanceAmount).toFixed(0);
+        const finalTotal = (parseFloat(eBill) + rent + serv + parseFloat(dues)).toFixed(0);
 
-        // ৩. হেডার লেবেল আপডেট করা (সবচেয়ে গুরুত্বপূর্ণ)
+        // ৪. হেডার লেবেল আপডেট
         updateHeaderLabel(currentAdvanceId, units, eBill, dues, finalTotal);
 
-        // ৪. শেষ ধাপ: UI আপডেট ও মডাল বন্ধ
+        // ৫. মডাল বন্ধ ও সাকসেস মেসেজ
         document.getElementById("current-advance-display").innerText = "0";
         closeAdvanceModal();
         
-        showGlobalLoader(`✅ বিল থেকে ৳${advanceAmount} কমিয়ে মোট ৳${finalTotal} করা হয়েছে।`);
+        showGlobalLoader(`✅ বিল অ্যাডজাস্ট হয়েছে। এখন প্রিন্ট করলে সঠিক বিল আসবে।`);
         await new Promise(r => setTimeout(r, 1500));
 
     } catch (e) {
-        alert("কানেকশন এরর! অ্যাডজাস্টমেন্ট সম্পন্ন হয়নি।");
+        alert("কানেকশন এরর!");
     } finally {
         hideGlobalLoader();
     }
@@ -822,6 +826,7 @@ function generatePrintView() {
     });
     window.print();
 }
+
 
 
 
