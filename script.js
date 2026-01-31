@@ -229,10 +229,13 @@ function init() {
             </div>
             <div class="accord-btn">
                 <button type="button" class="btn-clear" onclick="clearTenantBalance('${t.id}')">
-                    নতুন ভাড়াটিয়া (ব্যালেন্স ০ করুন)
+                    রিসেট (0)
+                </button>
+                <button type="button" class="btn-advance" onclick="openAdvanceModal('${t.id}')">
+                    ⚡ অ্যাডভান্স
                 </button>
                 <button type="button" class="btn-paid" onclick="saveDepositEntry('${t.id}')">
-                    জমা টাকা সেভ করুন 💰 
+                    💰 জমা সেভ
                 </button>
             </div>
         </div>`;
@@ -807,4 +810,5 @@ function generatePrintView() {
     });
     window.print();
 }
+
 
