@@ -99,15 +99,17 @@ body {
 }
 
 .red {
-	background: #f7768e;
+  background: #FF605C;
 }
-
 .yellow {
-	background: #e0af68;
+  background: #FFBD44;
 }
-
 .green {
-	background: #9ece6a;
+  background: #00CA4E;
+}
+.title-text {
+  text-align: center;
+  width: 100%;
 }
 
 .content {
@@ -721,3 +723,4 @@ button:hover {
 		align-items: start !important;
 	}
 }
+
