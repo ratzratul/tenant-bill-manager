@@ -333,8 +333,10 @@ button:hover {
 }
 
 /* কমন বাটন স্টাইল */
+
 .btn-paid,
-.btn-clear {
+.btn-clear,
+.btn-advance {
 	width: 100%;
 	/* মোবাইলে বাটন পুরো জায়গা নিবে */
 	border: none;
@@ -350,6 +352,11 @@ button:hover {
 	color: white;
 	font-size: 14px;
 }
+.btn-advance {
+  background: #ffcc00; /* হলুদ রঙ */
+  color: #000;
+  font-size: 13px;
+}
 
 .btn-clear {
 	background: #800000;
@@ -358,7 +365,8 @@ button:hover {
 }
 
 .btn-paid:hover,
-.btn-clear:hover {
+.btn-clear:hover,
+.btn-advance {
 	opacity: 0.9;
 }
 
@@ -370,16 +378,11 @@ button:hover {
 		justify-content: space-between;
 	}
 
-	.btn-clear {
+	.btn-clear, .btn-paid, .btn-advance {
 		flex: 1;
 		/* বাটন সমান জায়গা নিবে */
-		max-width: 48%;
+		max-width: 32%;
 		/* বাটন দুটির মাঝখানে গ্যাপ রাখার জন্য */
-	}
-
-	.btn-paid {
-		flex: 1;
-		max-width: 48%;
 	}
 }
 
@@ -503,20 +506,6 @@ button:hover {
 		grid-template-columns: 1fr !important;
 	}
 }
-/* নতুন অ্যাডভান্স বাটন স্টাইল */
-.btn-advance {
-  background: #ffcc00; /* হলুদ রঙ */
-  color: #000;
-  border: none;
-  padding: 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 13px;
-  width: 100%;
-  transition: 0.3s;
-}
-.btn-advance:hover { background: #e6b800; }
 
 /* মডাল ওভারলে (ব্যাকগ্রাউন্ড) */
 .modal-overlay {
@@ -803,6 +792,7 @@ button:hover {
 		align-items: start !important;
 	}
 }
+
 
 
 
