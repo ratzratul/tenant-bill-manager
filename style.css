@@ -654,7 +654,7 @@ button:hover {
 		flex-direction: column;
 		justify-content: space-around;
 		/* টেক্সটগুলো সেলের ভেতর ছড়িয়ে থাকবে  */
-		padding: 3px;
+		padding: 2px;
 		box-sizing: border-box;
 		overflow: hidden;
 	}
@@ -798,6 +798,7 @@ button:hover {
 		align-items: start !important;
 	}
 }
+
 
 
 
