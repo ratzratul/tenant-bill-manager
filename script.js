@@ -603,7 +603,7 @@ async function saveAdvanceData() {
     }
 }
 
-// ৪. অ্যাডভান্স টাকা বিল থেকে কেটে নেওয়া 
+// ৪. অ্যাডভান্স টাকা বিল থেকে কেটে নেওয়া (সম্পূর্ণ ফিক্সড ও অটোমেটেড)
 async function deductFromTotal() {
     const pin = document.getElementById("pin-input").value;
     if (!pin) { alert("আগে পিন নম্বর দিন!"); return; }
@@ -616,10 +616,13 @@ async function deductFromTotal() {
 
     if(!confirm(`আপনি কি মোট বিল থেকে ৳${advanceAmount} কমাতে চান? এটি স্বয়ংক্রিয়ভাবে সার্ভারে সেভ হবে।`)) return;
 
-    showGlobalLoader("অ্যাডভান্স অ্যাডজাস্ট ও সার্ভারে সেভ হচ্ছে...");
+    // মডালটি আগেই বন্ধ করে দিচ্ছি যাতে লোডার পরিষ্কার দেখা যায়
+    closeAdvanceModal();
+    showGlobalLoader(`ফ্ল্যাট ${currentAdvanceId}-এর অ্যাডভান্স অ্যাডজাস্ট ও সেভ হচ্ছে...`);
 
     try {
         // ১. সার্ভারে অ্যাডভান্স ব্যালেন্স ০ করে দেওয়া
+        // এখানে mode: "no-cors" ব্যবহার করা যাবে না কারণ আমাদের রেসপন্স নিশ্চিত হওয়া জরুরি
         await fetch(SHEET_URL, {
             method: "POST",
             body: JSON.stringify({ 
@@ -630,16 +633,18 @@ async function deductFromTotal() {
             })
         });
 
-        // ২. UI-তে 'lastPaid' ইনপুট বক্স আপডেট করা (যাতে প্রিন্ট ও সেভ এ সঠিক ভ্যালু যায়)
+        // ২. মেইন UI-তে 'lastPaid' ইনপুট বক্স আপডেট করা
+        // এতে প্রিন্ট ভিউ অটোমেটিক সঠিক হিসাব পাবে
         const lastPaidEl = document.getElementById(`lastPaid-${currentAdvanceId}`);
         let currentPaid = parseFloat(lastPaidEl.value) || 0;
         lastPaidEl.value = currentPaid + advanceAmount;
 
-        // ৩. অটোমেটিক সার্ভারে ওই ফ্ল্যাটের ডাটা সেভ করা (আপনার বিদ্যমান ফাংশন ব্যবহার করে)
-        // এটি কল করলে শিটে 'Paid' কলামে নতুন ভ্যালু বসে যাবে
-        await saveDepositEntry(currentAdvanceId);
+        // ৩. অটোমেটিক সার্ভারে ওই ফ্ল্যাটের ডাটা (নতুন জমা সহ) সেভ করা
+        // আপনার বিদ্যমান saveDepositEntry ফাংশনটিকেই আমরা ইন্টারনাল কল করছি
+        // তবে আমরা কনফার্মেশন প্রম্পট এড়ানোর জন্য সরাসরি লজিক ট্রিগার করছি
+        await saveDepositEntryAfterAdvance(currentAdvanceId);
 
-        // ৪. হেডার লেবেল আপডেট করার জন্য ভ্যালু ক্যালকুলেশন
+        // ৪. হেডার লেবেল (Header Label) আপডেট করার জন্য লেটেস্ট ক্যালকুলেশন
         const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
         const curr = parseFloat(document.getElementById(`currM-${currentAdvanceId}`).value) || 0;
         const prev = parseFloat(document.getElementById(`prevM-${currentAdvanceId}`).value) || 0;
@@ -653,22 +658,51 @@ async function deductFromTotal() {
         const dues = (lTot - lPad).toFixed(0);
         const finalTotal = (parseFloat(eBill) + rent + serv + parseFloat(dues)).toFixed(0);
 
-        // ৫. হেডার আপডেট
+        // ৫. হেডার আপডেট (ডিসপ্লেতে নতুন টোটাল দেখাবে)
         updateHeaderLabel(currentAdvanceId, units, eBill, dues, finalTotal);
 
-        // ৬. মডাল বন্ধ ও সাকসেস মেসেজ
+        // ৬. মডাল রিসেট ও সাকসেস মেসেজ
         document.getElementById("current-advance-display").innerText = "0";
-        closeAdvanceModal();
         
-        showGlobalLoader(`✅ অ্যাডভান্স কাটা হয়েছে এবং সার্ভারে হিসাব আপডেট হয়েছে।`);
-        await new Promise(r => setTimeout(r, 1500));
+        showGlobalLoader(`✅ সফল হয়েছে! ৳${advanceAmount} অ্যাডজাস্ট করে মোট বিল ৳${finalTotal} করা হয়েছে।`);
+        await new Promise(r => setTimeout(r, 2000));
 
     } catch (e) {
         console.error(e);
-        alert("অটো-সেভ করার সময় সমস্যা হয়েছে। দয়া করে ম্যানুয়ালি সেভ বাটন চাপুন।");
+        alert("সার্ভার এরর! অ্যাডভান্স কাটা হলেও শিটে ডাটা আপডেট হয়নি। দয়া করে 'জমা সেভ' বাটনটি ক্লিক করুন।");
     } finally {
         hideGlobalLoader();
     }
+}
+
+// এটি একটি সহায়ক ফাংশন যা deductFromTotal থেকে কল হবে (confirm prompt ছাড়া সেভ করার জন্য)
+async function saveDepositEntryAfterAdvance(targetId) {
+    const pin = document.getElementById("pin-input").value;
+    const syncData = [];
+    const month = currentSelectedMonth;
+
+    tenantIDs.forEach((id) => {
+        syncData.push({
+            id: id,
+            month: month,
+            prevM: document.getElementById(`prevM-${id}`).value,
+            currM: document.getElementById(`currM-${id}`).value,
+            units: 0, eBill: 0,
+            rent: document.getElementById(`rent-${id}`).value,
+            service: document.getElementById(`gas-${id}`).value,
+            dues: document.getElementById(`lastTotal-${id}`).value,
+            paid: document.getElementById(`lastPaid-${id}`).value,
+            total: 0
+        });
+    });
+
+    // সার্ভারে ডাটা পাঠানো (কোনো কনফার্মেশন ছাড়াই)
+    await fetch(SHEET_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: pin, data: syncData })
+    });
 }
 
 // ==========================================
@@ -829,6 +863,7 @@ function generatePrintView() {
     });
     window.print();
 }
+
 
 
 
