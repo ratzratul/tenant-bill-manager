@@ -11,7 +11,7 @@ let currentSelectedMonth = "";
 let adjustedAdvances =  {
 };
 let typeInterval;
- // টাইপিং এনিমেশনের জন্য
+// টাইপিং এনিমেশনের জন্য
 // ==========================================
 // ২. লোডার ফাংশন (Manually Added HTML Control)
 // ==========================================
@@ -24,19 +24,19 @@ function showGlobalLoader(message)  {
     textEl.textContent = "";
     let i = 0;
     clearInterval(typeInterval);
-     // আগের ইন্টারভাল থাকলে ক্লিয়ার করবে
+    // আগের ইন্টারভাল থাকলে ক্লিয়ার করবে
     typeInterval = setInterval(() =>  {
       if (i < message.length)  {
         // textContent ব্যবহার করলে স্পেস ঠিকমতো কাজ করে
         textEl.textContent += message.charAt(i);
         i++;
       }
-       else  {
+      else  {
         // লেখা শেষ হলে ডট অ্যানিমেশন (...)
         if (textEl.textContent.length < message.length + 3)  {
           textEl.textContent += ".";
         }
-         else  {
+        else  {
           // ৩টি ডট হয়ে গেলে আবার মেইন মেসেজে ফিরে যাবে (লুপ হবে)
           textEl.textContent = message;
         }
@@ -48,7 +48,7 @@ function hideGlobalLoader()  {
   const loader = document.getElementById('global-loader');
   if (loader)  {
     loader.style.display = 'none';
-     // লোডার লুকিয়ে ফেলবে
+    // লোডার লুকিয়ে ফেলবে
   }
   clearInterval(typeInterval);
 }
@@ -67,7 +67,7 @@ function checkPin()  {
     document.getElementById("login-screen").style.display = "none";
     loadDataFromSheet();
   }
-   else  {
+  else  {
     alert("দয়া করে পিন দিন!");
   }
 }
@@ -89,9 +89,9 @@ async function loadDataFromSheet()  {
     };
   });
   init();
-   // UI তৈরি
+  // UI তৈরি
   handleMonthChange();
-   // ডাটা ফেচ
+  // ডাটা ফেচ
 }
 // ==========================================
 // ৪. ডাটা ফেচিং (লোডার সহ)
@@ -106,7 +106,7 @@ async function handleMonthChange()  {
     if (currentData && currentData.length > 0)  {
       renderDataToUI(currentData);
     }
-     else  {
+    else  {
       // যদি কারেন্ট মাসে ডাটা না থাকে
       showGlobalLoader("বর্তমান ডাটা নেই! আগের মাসের ডাটা খোঁজা হচ্ছে...");
       const prevMonth = getPreviousMonth(selectedMonth);
@@ -118,7 +118,7 @@ async function handleMonthChange()  {
         showGlobalLoader(`${getBnMonthName(prevMonth)} মাসের রিডিং ও ভাড়া অটোমেটিক বসানো হয়েছে...`);
         await new Promise(resolve => setTimeout(resolve, 1500));
       }
-       else  {
+      else  {
         // যদি আগের মাসেও ডাটা না থাকে, তবেই হার্ডকোডেড ডিফল্ট বসাবে
         resetToDefaults();
         showGlobalLoader("কোনো পূর্ববর্তী ডাটা পাওয়া যায়নি। ডিফল্ট সেট করা হচ্ছে...");
@@ -126,65 +126,55 @@ async function handleMonthChange()  {
       }
     }
   }
-   catch (e)  {
+  catch (e)  {
     console.error("Load Error:", e);
     alert("ডাটা লোড করতে সমস্যা হয়েছে।");
   }
-   finally  {
+  finally  {
     hideGlobalLoader();
   }
 }
 // ==========================================
 // ৫. UI রেন্ডারিং
 // ==========================================
-function renderDataToUI(data) {
+function renderDataToUI(data)  {
   const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
-  data.forEach(row => {
+  data.forEach(row =>  {
     const id = row.id;
-    if (document.getElementById(`currM-${id}`)) {
+    if (document.getElementById(`currM-${id}`))  {
       document.getElementById(`prevM-${id}`).value = row.prevM;
       document.getElementById(`currM-${id}`).value = row.currM;
       document.getElementById(`rent-${id}`).value = row.rent;
       document.getElementById(`gas-${id}`).value = row.service;
-      
-      // গুরুত্বপূর্ণ পরিবর্তন:
-      // শিটে থাকা dues হলো জমা কাটার পরের অংশ। 
-      // গত মাসের আসল পাওনা পেতে dues + paid যোগ করতে হবে।
-      const originalDuesFromPrevMonth = parseFloat(row.dues || 0) + parseFloat(row.paid || 0);
-      document.getElementById(`lastTotal-${id}`).value = originalDuesFromPrevMonth;
-      
+      // সরাসরি শিটের ভ্যালু বসবে (যা এখন অরিজিনাল পাওনা)
+      document.getElementById(`lastTotal-${id}`).value = row.dues || 0;
       document.getElementById(`lastPaid-${id}`).value = row.paid || 0;
-
       const units = row.currM - row.prevM;
       const eBill = (units * rate).toFixed(0);
-      
-      // লেবেলে দেখানোর সময় row.dues-ই দেখাব কারণ সেটা অলরেডি ক্যালকুলেটেড বকেয়া
-      updateHeaderLabel(id, units, eBill, row.dues, row.total);
+      const netDues = (parseFloat(row.dues) - parseFloat(row.paid)).toFixed(0);
+      updateHeaderLabel(id, units, eBill, netDues, row.total);
     }
   });
 }
-function populateFromPrevious(prevData) {
+function populateFromPrevious(prevData)  {
   resetToDefaults();
-  prevData.forEach(row => {
+  prevData.forEach(row =>  {
     const id = row.id;
-    if (document.getElementById(`prevM-${id}`)) {
+    if (document.getElementById(`prevM-${id}`))  {
       document.getElementById(`prevM-${id}`).value = row.currM;
     }
-    
-    // এই মাসের 'গত মাসের পাওনা' হবে আগের মাসের 'Total' থেকে 'Paid' বাদ দেওয়ার পর যা থাকে
-    // অর্থাৎ আগের মাসের নিট বকেয়া।
-    if (document.getElementById(`lastTotal-${id}`)) {
-      const netDuesFromPrev = parseFloat(row.total || 0) - parseFloat(row.paid || 0);
-      document.getElementById(`lastTotal-${id}`).value = netDuesFromPrev;
+    // ফেব্রুয়ারি মাসের "গত মাসের পাওনা" হবে জানুয়ারির (Total - Paid)
+    if (document.getElementById(`lastTotal-${id}`))  {
+      const remainingDues = parseFloat(row.total || 0) - parseFloat(row.paid || 0);
+      document.getElementById(`lastTotal-${id}`).value = remainingDues.toFixed(0);
     }
-
-    if (document.getElementById(`rent-${id}`)) {
+    if (document.getElementById(`rent-${id}`))  {
       document.getElementById(`rent-${id}`).value = row.rent;
     }
-    if (document.getElementById(`gas-${id}`)) {
+    if (document.getElementById(`gas-${id}`))  {
       document.getElementById(`gas-${id}`).value = row.service;
     }
-    if (document.getElementById(`label-${id}`)) {
+    if (document.getElementById(`label-${id}`))  {
       document.getElementById(`label-${id}`).innerHTML = "<span style='color: #008080;'>আগের মাসের ডাটা লোড হয়েছে...</span>";
     }
   });
@@ -280,16 +270,18 @@ async function calculateAll()  {
     const lPad = parseFloat(document.getElementById(`lastPaid-${id}`).value) || 0;
     const units = curr - prev;
     const eBill = (units * rate).toFixed(0);
-    const dues = (lTot - lPad).toFixed(0);
-    const total = (parseFloat(eBill) + rent + serv + parseFloat(dues)).toFixed(0);
-    updateHeaderLabel(id, units, eBill, dues, total);
+    // নিট বকেয়া (জমা বাদ দিয়ে) যা শুধু লেবেলে ও টোটালে ব্যবহার হবে
+    const netDues = (lTot - lPad);
+    const total = (parseFloat(eBill) + rent + serv + netDues).toFixed(0);
+    updateHeaderLabel(id, units, eBill, netDues.toFixed(0), total);
     syncData.push( {
-      id,month,prevM: prev,currM: curr,units,eBill,rent,service: serv,dues,total,paid: lPad // জমা টাকা ডাটাবেজে যাবে
+      id, month, prevM: prev, currM: curr, units, eBill, rent, service: serv, dues: lTot, // এখানে সরাসরি গত মাসের পাওনা সেভ হচ্ছে (জমা বাদ না দিয়ে)
+      paid: lPad, total: total
     });
   });
   try  {
     await fetch(SHEET_URL,  {
-      method: "POST",mode: "no-cors",headers:  {
+      method: "POST", mode: "no-cors",headers:  {
          "Content-Type": "application/json"
       },body: JSON.stringify( {
          pin: pin, data: syncData
@@ -297,13 +289,9 @@ async function calculateAll()  {
     });
     showGlobalLoader("✅ হিসাব সম্পন্ন এবং সার্ভারে সেভ হয়েছে!");
     await new Promise(resolve => setTimeout(resolve, 1500));
-    if (document.getElementById("btn-undo"))  {
-      document.getElementById("btn-undo").style.display = "inline-block";
-    }
   }
    catch (e)  {
-    console.error("Save Error:", e);
-    alert("সার্ভার এরর! ইন্টারনেট কানেকশন চেক করুন।");
+    alert("সার্ভার এরর!");
   }
    finally  {
     hideGlobalLoader();
@@ -315,18 +303,11 @@ async function calculateAll()  {
 async function saveDepositEntry(targetId)  {
   const pin = document.getElementById("pin-input").value;
   if (!pin)  {
-    alert("আগে পিন নম্বর দিন!");
-    return;
+     alert("আগে পিন নম্বর দিন!");
+     return;
   }
   const paidAmount = document.getElementById(`lastPaid-${targetId}`).value;
   if (!confirm(`ফ্ল্যাট ${targetId}-এর জমা: ৳${paidAmount} সেভ করতে চাচ্ছেন?`)) return;
-  const btn = document.querySelector(`button[onclick="saveDepositEntry('${targetId}')"]`);
-  let originalText = "";
-  if (btn)  {
-    originalText = btn.innerText;
-    btn.innerText = "⏳...";
-    btn.disabled = true;
-  }
   showGlobalLoader(`ফ্ল্যাট ${targetId} এর জমা লিপিবদ্ধ হচ্ছে...`);
   const syncData = [];
   const month = currentSelectedMonth;
@@ -340,33 +321,28 @@ async function saveDepositEntry(targetId)  {
     const lPd = parseFloat(document.getElementById(`lastPaid-${id}`).value) || 0;
     const units = cM - pM;
     const eB = (units * rate);
-    const currentDues = (lTt - lPd);
-    const currentTotal = (eB + rnt + srv + currentDues).toFixed(0);
+    const total = (eB + rnt + srv + (lTt - lPd)).toFixed(0);
     syncData.push( {
-      id: id,month: month,prevM: pM,currM: cM,units: units,eBill: eB.toFixed(0),rent: rnt,service: srv,dues: currentDues.toFixed(0),total: currentTotal,paid: lPd // লেটেস্ট জমা ডাটাবেজে যাবে
+      id: id, month: month, prevM: pM, currM: cM, units: units, eBill: eB.toFixed(0),rent: rnt, service: srv, dues: lTt, // অরিজিনাল পাওনা অপরিবর্তিত থাকবে
+      paid: lPd, total: total
     });
   });
   try  {
     await fetch(SHEET_URL,  {
-      method: "POST",mode: "no-cors",headers:  {
+      method: "POST", mode: "no-cors",headers:  {
          "Content-Type": "application/json"
       },body: JSON.stringify( {
          pin: pin, data: syncData
       })
     });
-    showGlobalLoader(`✅ ফ্ল্যাট ${targetId}-এর টাকা জমা সাকসেসফুল!`);
+    showGlobalLoader(`✅ জমা সাকসেসফুল!`);
     await new Promise(resolve => setTimeout(resolve, 1500));
   }
    catch (e)  {
-    console.error(e);
-    alert("সার্ভার কানেকশন এরর!");
+     alert("এরর!");
   }
    finally  {
-    if (btn)  {
-      btn.innerText = originalText;
-      btn.disabled = false;
-    }
-    hideGlobalLoader();
+     hideGlobalLoader();
   }
 }
 // ==========================================
@@ -392,10 +368,10 @@ async function downloadBackup()  {
     showGlobalLoader("✅ ডাউনলোড শুরু হয়েছে...");
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
-   catch (e)  {
+  catch (e)  {
     alert("ডাউনলোড এরর! সার্ভার থেকে ডাটা পাওয়া যায়নি।");
   }
-   finally  {
+  finally  {
     hideGlobalLoader();
   }
 }
@@ -412,17 +388,17 @@ function importData(input)  {
       await fetch(SHEET_URL,  {
         method: "POST",mode: "no-cors",headers:  {
           "Content-Type": "application/json"
-        },body: JSON.stringify( {
+        },body: JSON.stringify(  {
           pin: pin,data: backupData
         })
       });
       // সাকসেস মেসেজ ও রিলোড
       showGlobalLoader("✅ ব্যাকআপ আপলোড সম্পন্ন! পেজ রিলোড হচ্ছে...");
       await new Promise(resolve => setTimeout(resolve, 2000));
-       // ২ সেকেন্ড দেখাবে
+      // ২ সেকেন্ড দেখাবে
       location.reload();
     }
-     catch (err)  {
+    catch (err)  {
       hideGlobalLoader();
       alert("ভুল ফাইল ফরম্যাট বা আপলোড এরর!");
     }
@@ -452,16 +428,16 @@ async function resetLastInput()  {
       await new Promise(resolve => setTimeout(resolve, 2000));
       window.location.reload();
     }
-     else if (result === "Unauthorized")  {
+    else if (result === "Unauthorized")  {
       hideGlobalLoader();
       alert("ভুল পিন! ডাটা মোছার অনুমতি নেই।");
     }
-     else  {
+    else  {
       hideGlobalLoader();
       alert("এরর: " + result);
     }
   }
-   catch (e)  {
+  catch (e)  {
     hideGlobalLoader();
     alert("সার্ভার এরর!");
   }
@@ -470,7 +446,7 @@ async function resetLastInput()  {
 // ১০. Advance logic and function
 // ==========================================
 let currentAdvanceId = null;
- // ১. মডাল ওপেন করা এবং ডাটা ফেচ করা
+// ১. মডাল ওপেন করা এবং ডাটা ফেচ করা
 async function openAdvanceModal(id)  {
   currentAdvanceId = id;
   document.getElementById("adv-modal-id").innerText = id;
@@ -482,10 +458,10 @@ async function openAdvanceModal(id)  {
     document.getElementById("current-advance-display").innerText = data.amount || 0;
     document.getElementById("advanceModal").style.display = "flex";
   }
-   catch (e)  {
+  catch (e)  {
     alert("অ্যাডভান্স ডাটা লোড করা যায়নি!");
   }
-   finally  {
+  finally  {
     hideGlobalLoader();
   }
 }
@@ -497,20 +473,20 @@ function closeAdvanceModal()  {
 async function saveAdvanceData()  {
   const pin = document.getElementById("pin-input").value;
   if (!pin)  {
-     alert("আগে পিন নম্বর দিন!");
-     return;
+    alert("আগে পিন নম্বর দিন!");
+    return;
   }
   const amount = parseFloat(document.getElementById("new-advance-input").value);
   if (isNaN(amount))  {
-     alert("সঠিক টাকার পরিমাণ দিন!");
-     return;
+    alert("সঠিক টাকার পরিমাণ দিন!");
+    return;
   }
   showGlobalLoader("অ্যাডভান্স সেভ হচ্ছে...");
   try  {
     // mode: "no-cors" সরালাম কারণ এতে সাকসেস বোঝা যায় না
     await fetch(SHEET_URL,  {
-      method: "POST",body: JSON.stringify( {
-         pin: pin,action: "updateAdvance",id: currentAdvanceId, amount: amount
+      method: "POST",body: JSON.stringify(  {
+        pin: pin,action: "updateAdvance",id: currentAdvanceId, amount: amount
       })
     });
     document.getElementById("current-advance-display").innerText = amount;
@@ -518,10 +494,10 @@ async function saveAdvanceData()  {
     showGlobalLoader("✅ অ্যাডভান্স সেভ হয়েছে!");
     await new Promise(r => setTimeout(r, 1200));
   }
-   catch (e)  {
+  catch (e)  {
     alert("সেভ এরর!");
   }
-   finally  {
+  finally  {
     hideGlobalLoader();
   }
 }
@@ -529,8 +505,8 @@ async function saveAdvanceData()  {
 async function deductFromTotal()  {
   const pin = document.getElementById("pin-input").value;
   if (!pin)  {
-     alert("আগে পিন নম্বর দিন!");
-     return;
+    alert("আগে পিন নম্বর দিন!");
+    return;
   }
   const advanceAmount = parseFloat(document.getElementById("current-advance-display").innerText);
   if (advanceAmount <= 0)  {
@@ -542,8 +518,8 @@ async function deductFromTotal()  {
   showGlobalLoader(`ফ্ল্যাট ${currentAdvanceId}-এর অ্যাডভান্স অ্যাডজাস্ট ও সেভ হচ্ছে...`);
   try  {
     await fetch(SHEET_URL,  {
-      method: "POST",body: JSON.stringify( {
-         pin: pin,action: "updateAdvance",id: currentAdvanceId, amount: 0
+      method: "POST",body: JSON.stringify(  {
+        pin: pin,action: "updateAdvance",id: currentAdvanceId, amount: 0
       })
     });
     const lastPaidEl = document.getElementById(`lastPaid-${currentAdvanceId}`);
@@ -559,7 +535,7 @@ async function deductFromTotal()  {
     const serv = parseFloat(document.getElementById(`gas-${currentAdvanceId}`).value) || 0;
     const lTot = parseFloat(document.getElementById(`lastTotal-${currentAdvanceId}`).value) || 0;
     const lPad = parseFloat(lastPaidEl.value);
-     const units = curr - prev;
+    const units = curr - prev;
     const eBill = (units * rate).toFixed(0);
     const dues = (lTot - lPad).toFixed(0);
     const finalTotal = (parseFloat(eBill) + rent + serv + parseFloat(dues)).toFixed(0);
@@ -568,11 +544,11 @@ async function deductFromTotal()  {
     showGlobalLoader(`✅ সফল হয়েছে! ৳${advanceAmount} অ্যাডজাস্ট করে মোট বিল ৳${finalTotal} করা হয়েছে।`);
     await new Promise(r => setTimeout(r, 2000));
   }
-   catch (e)  {
+  catch (e)  {
     console.error(e);
     alert("সার্ভার এরর!");
   }
-   finally  {
+  finally  {
     hideGlobalLoader();
   }
 }
@@ -583,17 +559,19 @@ async function saveDepositEntryAfterAdvance(targetId)  {
   const month = currentSelectedMonth;
   const rate = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
   tenantIDs.forEach((id) =>  {
-    // স্ক্রিন থেকে ডাটা নেওয়া
     const cM = parseFloat(document.getElementById(`currM-${id}`).value) || 0;
     const pM = parseFloat(document.getElementById(`prevM-${id}`).value) || 0;
+    const rnt = parseFloat(document.getElementById(`rent-${id}`).value) || 0;
+    const srv = parseFloat(document.getElementById(`gas-${id}`).value) || 0;
     const lTt = parseFloat(document.getElementById(`lastTotal-${id}`).value) || 0;
     const lPd = parseFloat(document.getElementById(`lastPaid-${id}`).value) || 0;
     const units = cM - pM;
-    const eB = (units * rate).toFixed(0);
-    const currentTotal = (parseFloat(eB) + parseFloat(document.getElementById(`rent-${id}`).value) + parseFloat(document.getElementById(`gas-${id}`).value) + (lTt - lPd)).toFixed(0);
+    const eB = (units * rate);
+    // টোটাল বের করার সময় অবশ্যই জমা (lPd) বাদ দিতে হবে
+    const currentTotal = (eB + rnt + srv + (lTt - lPd)).toFixed(0);
     syncData.push( {
-      id: id,month: month,prevM: pM,currM: cM,units: units,eBill: eB,rent: document.getElementById(`rent-${id}`).value,service: document.getElementById(`gas-${id}`).value,dues: (lTt - lPd).toFixed(0),paid: lPd, // এই যে আপনার 'Paid' কলাম আপডেট হবে
-      total: currentTotal // এখানে সঠিক টোটাল যাবে, ০ যাবে না
+      id: id,month: month,prevM: pM,currM: cM,units: units,eBill: eB.toFixed(0),rent: rnt,service: srv,dues: lTt, // এখানেও আমরা অরিজিনাল পাওনা সেভ করছি (জমা বাদ না দিয়ে)
+      paid: lPd, total: currentTotal
     });
   });
   await fetch(SHEET_URL,  {
@@ -640,7 +618,7 @@ function setupBillingDate()  {
       handleMonthChange();
     };
   }
-   else  {
+  else  {
     cal.style.display = "none";
     drop.style.display = "flex";
     renderDynamicDateControls();
@@ -652,8 +630,8 @@ function renderDynamicDateControls()  {
   const curYear = now.getFullYear();
   let html = `<select id="billingMonth_Year" onchange="updateSelectedYear(this.value)">`;
   for (let i = curYear;
-   i >= 2015;
-   i--)  {
+  i >= 2015;
+  i--)  {
     const isSelected = currentSelectedMonth.split('-')[0] == i ? "selected" : "";
     html += `<option value="${i}" ${isSelected}>${enToBnNumber(i)}</option>`;
   }
@@ -726,7 +704,7 @@ function generatePrintView()  {
       const dues = (lTot - lPad);
       const total = eBill + rent + serv + dues;
       // অ্যাডভান্স নোট লজিক
-      const advNote = (typeof adjustedAdvances !== 'undefined' && adjustedAdvances[id]) ? `<p style="color: #006666; font-size: 12px; font-style: italic; margin: 2px 0;">* মোট পাওনা থেকে অ্যাডভান্স ৳${enToBnNumber(adjustedAdvances[id])} সমন্বয় করা হয়েছে।</p>` : "";
+      const advNote = (typeof adjustedAdvances !== 'undefined' && adjustedAdvances[id]) ? `<p style="color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center;">* অ্যাডভান্স ৳${enToBnNumber(adjustedAdvances[id])} বাদ দেয়া হয়েছে।</p>` : "";
       html += `
             <div class="bill-cell">
             <h4>${enToBnNumber(id)} (${formattedMonth}) এর জন্যঃ</h4>
