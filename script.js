@@ -705,9 +705,10 @@ function generatePrintView()  {
       const total = eBill + rent + serv + dues;
       // অ্যাডভান্স নোট লজিক
       const advNote = (typeof adjustedAdvances !== 'undefined' && adjustedAdvances[id]) ? `<p style="color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center;">* অ্যাডভান্স ৳${enToBnNumber(adjustedAdvances[id])} বাদ দেয়া হয়েছে।</p>` : "";
+      const shortFormattedMonth = formattedMonth.replace(" - ২০", " - '");
       html += `
             <div class="bill-cell">
-            <h4>${enToBnNumber(id)} (${formattedMonth}) এর জন্যঃ</h4>
+            <h4>${enToBnNumber(id)} (${shortFormattedMonth}) এর জন্যঃ</h4>
             <p>মাস শেষের মিটার রিডিং: ${enToBnNumber(curr)}</p>
             <p>মাস শুরুর মিটার রিডিং: ${enToBnNumber(prev)}</p>
             <p>ব্যবহৃত ইউনিট: ${enToBnNumber(units.toFixed(0))}</p>
@@ -728,3 +729,4 @@ function generatePrintView()  {
   });
   window.print();
 }
+
