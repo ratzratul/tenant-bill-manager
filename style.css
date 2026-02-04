@@ -614,7 +614,7 @@ button:hover {
 		/* A4 Width  */
 		height: 297mm !important;
 		/* A4 Height  */
-		padding: 1mm 3mm 2mm 15mm !important;
+		padding: 1mm 2mm 2mm 16mm !important;
 		/* বামে পাঞ্চ করার জায়গা  */
 		box-sizing: border-box;
 	}
@@ -634,6 +634,7 @@ button:hover {
 	h4 {
     color: #000000 !important;
     -webkit-print-color-adjust: exact; /* Chrome/Safari */
+	print-color-adjust: exact;
 	}
 
 	.print-grid {
@@ -654,7 +655,7 @@ button:hover {
 		flex-direction: column;
 		justify-content: space-around;
 		/* টেক্সটগুলো সেলের ভেতর ছড়িয়ে থাকবে  */
-		padding: 2px 1px 1px 2px;
+		padding: 1px;
 		box-sizing: border-box;
 		overflow: hidden;
 	}
@@ -798,6 +799,7 @@ button:hover {
 		align-items: start !important;
 	}
 }
+
 
 
 
