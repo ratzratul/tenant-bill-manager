@@ -712,14 +712,14 @@ function generatePrintView()  {
             <p>মাস শেষের মিটার রিডিংঃ ${enToBnNumber(curr)}</p>
             <p>মাস শুরুর মিটার রিডিংঃ ${enToBnNumber(prev)}</p>
             <p>ব্যবহৃত ইউনিটঃ ${enToBnNumber(units.toFixed(0))}</p>
-            <p><strong>বিদ্যুৎ বিল</strong>&nbsp;(${enToBnNumber(rate)}৳ হারে)&zwnj;ঃ&nbsp;<strong>${enToBnNumber(eBill.toFixed(0))}/-</strong></p>
+            <p><strong>বিদ্যুৎ বিল</strong>&nbsp;(${enToBnNumber(rate)}৳ হারে)：&nbsp;<strong>${enToBnNumber(eBill.toFixed(0))}/-</strong></p>
             <p>মাসিক ভাড়াঃ ${enToBnNumber(rent)}/-</p>
             <p>${id === "6B" ? "গ্যাস বিল ও সিঁড়ি ঝাড়ু" : "সিঁড়ি ঝাড়ু"}ঃ ${enToBnNumber(serv)}/-</p>
             <p><strong>${targetMonthName} মাসের বকেয়াঃ ${enToBnNumber(dues.toFixed(0))}৳</strong></p>
             ${advNote}
             <p class="total-row"><strong>এই মাসে মোট পাওনাঃ ${enToBnNumber(total.toFixed(0))}৳</strong></p>
             <div style="margin-top:10px; font-size:12px; font-style: italic; border-top: 1.5px dashed #000; padding-top:6px; text-align: center; line-height: 1.3;">
-            <strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বারঃ 01944529442 রেফারেন্স (Ref)&zwnj;ঃ ${id}</strong>
+            <strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বারঃ 01944529442 রেফারেন্স (Ref)： ${id}</strong>
             </div>
             </div>`;
     });
@@ -729,4 +729,5 @@ function generatePrintView()  {
   });
   window.print();
 }
+
 
