@@ -706,20 +706,21 @@ function generatePrintView()  {
       // অ্যাডভান্স নোট লজিক
       const advNote = (typeof adjustedAdvances !== 'undefined' && adjustedAdvances[id]) ? `<p style="color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center;">* অ্যাডভান্স ৳${enToBnNumber(adjustedAdvances[id])} বাদ দেয়া হয়েছে।</p>` : "";
       const shortFormattedMonth = formattedMonth.replace(" - ২০", " - '");
+      const bsrgo = '<span style="display:inline-flex; width:0.5em; overflow:hidden; justify-content:flex-end; vertical-align:baseline;">বঃ</span>';
       html += `
             <div class="bill-cell">
             <h4>${enToBnNumber(id)} (${shortFormattedMonth}) এর জন্যঃ</h4>
             <p>মাস শেষের মিটার রিডিংঃ ${enToBnNumber(curr)}</p>
             <p>মাস শুরুর মিটার রিডিংঃ ${enToBnNumber(prev)}</p>
             <p>ব্যবহৃত ইউনিটঃ ${enToBnNumber(units.toFixed(0))}</p>
-            <p><strong>বিদ্যুৎ বিল</strong>&nbsp;(${enToBnNumber(rate)}৳ হারে)：&nbsp;<strong>${enToBnNumber(eBill.toFixed(0))}/-</strong></p>
+            <p><strong>বিদ্যুৎ বিল</strong>&nbsp;(${enToBnNumber(rate)}৳ হারে)${bsrgo}&nbsp;<strong>${enToBnNumber(eBill.toFixed(0))}/-</strong></p>
             <p>মাসিক ভাড়াঃ ${enToBnNumber(rent)}/-</p>
             <p>${id === "6B" ? "গ্যাস বিল ও সিঁড়ি ঝাড়ু" : "সিঁড়ি ঝাড়ু"}ঃ ${enToBnNumber(serv)}/-</p>
             <p><strong>${targetMonthName} মাসের বকেয়াঃ ${enToBnNumber(dues.toFixed(0))}৳</strong></p>
             ${advNote}
             <p class="total-row"><strong>এই মাসে মোট পাওনাঃ ${enToBnNumber(total.toFixed(0))}৳</strong></p>
-            <div style="margin-top:10px; font-size:12px; font-style: italic; border-top: 1.5px dashed #000; padding-top:6px; text-align: center; line-height: 1.3;">
-            <strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বারঃ 01944529442 রেফারেন্স (Ref)： ${id}</strong>
+            <div style="margin-top:10px; font-size:12px; font-style: italic; border-top: 2px dashed #000; padding-top:6px; text-align: center; line-height: 1.3;">
+            <strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বারঃ 01944529442 রেফারেন্স (Ref): ${id}</strong>
             </div>
             </div>`;
     });
@@ -729,5 +730,6 @@ function generatePrintView()  {
   });
   window.print();
 }
+
 
 
