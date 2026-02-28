@@ -156,25 +156,30 @@ function renderDataToUI(data)  {
     }
   });
 }
-function populateFromPrevious(prevData)  {
+function populateFromPrevious(prevData) {
   resetToDefaults();
-  prevData.forEach(row =>  {
+  prevData.forEach(row => {
     const id = row.id;
-    if (document.getElementById(`prevM-${id}`))  {
+    
+    // মিটার রিডিং আপডেট
+    if (document.getElementById(`prevM-${id}`)) {
       document.getElementById(`prevM-${id}`).value = row.currM;
     }
-    // ফেব্রুয়ারি মাসের "গত মাসের পাওনা" হবে জানুয়ারির (Total - Paid)
-    if (document.getElementById(`lastTotal-${id}`))  {
-      const remainingDues = parseFloat(row.total || 0) - parseFloat(row.paid || 0);
-      document.getElementById(`lastTotal-${id}`).value = remainingDues.toFixed(0);
+
+    // সংশোধন: "গত মাসের পাওনা" ঘরে সরাসরি আগের মাসের Total বসবে
+    if (document.getElementById(`lastTotal-${id}`)) {
+      document.getElementById(`lastTotal-${id}`).value = parseFloat(row.total || 0).toFixed(0);
     }
-    if (document.getElementById(`rent-${id}`))  {
+
+    // ভাড়া ও সার্ভিস চার্জ লোড
+    if (document.getElementById(`rent-${id}`)) {
       document.getElementById(`rent-${id}`).value = row.rent;
     }
-    if (document.getElementById(`gas-${id}`))  {
+    if (document.getElementById(`gas-${id}`)) {
       document.getElementById(`gas-${id}`).value = row.service;
     }
-    if (document.getElementById(`label-${id}`))  {
+
+    if (document.getElementById(`label-${id}`)) {
       document.getElementById(`label-${id}`).innerHTML = "<span style='color: #008080;'>আগের মাসের ডাটা লোড হয়েছে...</span>";
     }
   });
@@ -730,3 +735,4 @@ function generatePrintView()  {
   });
   window.print();
 }
+
