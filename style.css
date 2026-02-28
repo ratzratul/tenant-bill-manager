@@ -576,8 +576,7 @@ button:hover {
 @media print {
 	@page {
 		size: A4;
-		margin: 0 !important;
-		/* ব্রাউজারের ডিফল্ট মার্জিন সরিয়ে দেয়া */
+		/* margin: JS থেকে আসবে */
 	}
 
 	body {
@@ -615,7 +614,7 @@ button:hover {
 		height: 297mm !important;
 		/* A4 Height  */
 		padding: 1mm 2mm 2mm 16mm !important;
-		/* বামে পাঞ্চ করার জায়গা  */
+		/* বামে পাঞ্চ করার জায়গা  */
 		box-sizing: border-box;
 	}
 
@@ -632,9 +631,9 @@ button:hover {
 	}
 
 	h4 {
-    color: #000000 !important;
-    -webkit-print-color-adjust: exact; /* Chrome/Safari */
-	print-color-adjust: exact;
+		color: #000000 !important;
+		-webkit-print-color-adjust: exact; /* Chrome/Safari */
+		print-color-adjust: exact;
 	}
 
 	.print-grid {
@@ -644,36 +643,220 @@ button:hover {
 		grid-template-rows: repeat(3, 1fr);
 		/* ৩ রো  */
 		height: calc(297mm - 15mm) !important;
-		/* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
+		/* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
 		width: 100% !important;
 		gap: 0;
 	}
 
 	.bill-cell {
-		border: 0.5px solid #000;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-around;
-		/* টেক্সটগুলো সেলের ভেতর ছড়িয়ে থাকবে  */
-		padding: 1px;
+		/* টেক্সটগুলো সেলের ভেতর ছড়িয়ে থাকবে  */
 		box-sizing: border-box;
 		overflow: hidden;
-	}
-
-	.bill-cell h4 {
-		margin: 0;
-		font-size: 16px;
-		text-align: center;
-		border-bottom: 1px solid #000;
-		padding-bottom: 2px;
+		/* border এবং padding JS থেকে আসবে */
 	}
 
 	.bill-cell p {
-		margin: 0;
 		line-height: 1.1;
-		font-size: 13.5px;
-		/* সর্বোচ্চ বড় ফন্ট  */
 		border-bottom: 0.1px solid #eee;
+		/* margin এবং font-size JS থেকে আসবে */
+	}
+
+	.page-break {
+		page-break-after: always;
+	}
+
+	.no-print {
+		display: none !important;
+	}
+}@media print {
+	@page {
+		size: A4;
+		/* margin: JS থেকে আসবে */
+	}
+
+	body {
+		margin: 0 !important;
+		padding: 0 !important;
+		background: white;
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+
+	body * {
+		visibility: hidden !important;
+	}
+
+	/* বাকি সব হাইড করা */
+	header,
+	footer,
+	nav,
+	.no-print {
+		display: none !important;
+	}
+
+	.print-only,
+	.print-only * {
+		visibility: visible !important;
+	}
+
+	.print-only {
+		display: block !important;
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 210mm !important;
+		/* A4 Width  */
+		height: 297mm !important;
+		/* A4 Height  */
+		padding: 1mm 2mm 2mm 16mm !important;
+		/* বামে পাঞ্চ করার জায়গা  */
+		box-sizing: border-box;
+	}
+
+	.page-header {
+		height: 12mm !important;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 20px;
+		font-weight: bold;
+		font-weight: 900;
+		border-bottom: 1.5px solid #000;
+		box-sizing: border-box;
+	}
+
+	h4 {
+		color: #000000 !important;
+		-webkit-print-color-adjust: exact; /* Chrome/Safari */
+		print-color-adjust: exact;
+	}
+
+	.print-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		/* ৩ কলাম  */
+		grid-template-rows: repeat(3, 1fr);
+		/* ৩ রো  */
+		height: calc(297mm - 15mm) !important;
+		/* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
+		width: 100% !important;
+		gap: 0;
+	}
+
+	.bill-cell {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		/* টেক্সটগুলো সেলের ভেতর ছড়িয়ে থাকবে  */
+		box-sizing: border-box;
+		overflow: hidden;
+		/* border এবং padding JS থেকে আসবে */
+	}
+
+	.bill-cell p {
+		line-height: 1.1;
+		border-bottom: 0.1px solid #eee;
+		/* margin এবং font-size JS থেকে আসবে */
+	}
+
+	.page-break {
+		page-break-after: always;
+	}
+
+	.no-print {
+		display: none !important;
+	}
+}@media print {
+	@page {
+		size: A4;
+		/* margin: JS থেকে আসবে */
+	}
+
+	body {
+		margin: 0 !important;
+		padding: 0 !important;
+		background: white;
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+
+	body * {
+		visibility: hidden !important;
+	}
+
+	/* বাকি সব হাইড করা */
+	header,
+	footer,
+	nav,
+	.no-print {
+		display: none !important;
+	}
+
+	.print-only,
+	.print-only * {
+		visibility: visible !important;
+	}
+
+	.print-only {
+		display: block !important;
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 210mm !important;
+		/* A4 Width  */
+		height: 297mm !important;
+		/* A4 Height  */
+		padding: 1mm 2mm 2mm 16mm !important;
+		/* বামে পাঞ্চ করার জায়গা  */
+		box-sizing: border-box;
+	}
+
+	.page-header {
+		height: 12mm !important;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 20px;
+		font-weight: bold;
+		font-weight: 900;
+		border-bottom: 1.5px solid #000;
+		box-sizing: border-box;
+	}
+
+	h4 {
+		color: #000000 !important;
+		-webkit-print-color-adjust: exact; /* Chrome/Safari */
+		print-color-adjust: exact;
+	}
+
+	.print-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		/* ৩ কলাম  */
+		grid-template-rows: repeat(3, 1fr);
+		/* ৩ রো  */
+		height: calc(297mm - 15mm) !important;
+		/* হেডার বাদ দিয়ে পুরো পাতা দখল করবে  */
+		width: 100% !important;
+		gap: 0;
+	}
+
+	.bill-cell {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		box-sizing: border-box;
+		overflow: hidden;
+		/* border এবং padding JS থেকে আসবে */
+	}
+
+	.bill-cell p {
+		line-height: 1.1;
+		border-bottom: 0.1px solid #eee;
+		/* margin এবং font-size JS থেকে আসবে */
 	}
 
 	.page-break {
@@ -799,6 +982,7 @@ button:hover {
 		align-items: start !important;
 	}
 }
+
 
 
 
