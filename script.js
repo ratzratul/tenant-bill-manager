@@ -725,7 +725,7 @@ function generatePrintView()  {
             ${advNote}
             <p class="total-row"><strong>এই মাসে মোট পাওনাঃ ${enToBnNumber(total.toFixed(0))}৳</strong></p>
             <div style="margin-top:10px; font-size:12px; border-top: 2px dashed #000; padding-top:4px; text-align: center; line-height: 1.3;">
-            <strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বারঃ 01944529442 রেফারেন্স (Ref): ${id}</strong>
+            <strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বারঃ 01944529442 রেফারেন্স(Ref): ${id}</strong>
             </div>
             </div>`;
     });
@@ -735,4 +735,5 @@ function generatePrintView()  {
   });
   window.print();
 }
+
 
