@@ -709,7 +709,7 @@ function generatePrintView()  {
       const dues = (lTot - lPad);
       const total = eBill + rent + serv + dues;
       // অ্যাডভান্স নোট লজিক
-      const advNote = (typeof adjustedAdvances !== 'undefined' && adjustedAdvances[id]) ? `<em style="color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center;">* অ্যাডভান্স ৳${enToBnNumber(adjustedAdvances[id])} বাদ দেয়া হয়েছে।</em>` : "";
+      const advNote = (typeof adjustedAdvances !== 'undefined' && adjustedAdvances[id]) ? `<div style="color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center;">* অ্যাডভান্স ৳${enToBnNumber(adjustedAdvances[id])} বাদ দেয়া হয়েছে।</div>` : "";
       const shortFormattedMonth = formattedMonth.replace(" - ২০", " - '");
       const bsrgo = '<span style="display:inline-flex; width:0.5em; overflow:hidden; justify-content:flex-end; vertical-align:baseline;">বঃ</span>';
       html += `
@@ -735,6 +735,7 @@ function generatePrintView()  {
   });
   window.print();
 }
+
 
 
 
