@@ -689,7 +689,7 @@ function generatePrintView()  {
         .bill-cell h4 { margin: 0 0 2px 0; font-size: 17px !important; font-weight: 500; text-align: center; border-bottom: 2px solid #000; padding-bottom: 3px; }
         .bill-cell p { margin: 3px 0; font-size: 15px !important; font-weight: 500; display: flex; }
         .bill-cell p.adv-note { color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center; }
-        .total-row { font-size: 16px !important; font-weight: 700 !important; border-top: 1.5px solid #000 !important; margin-top: 6px !important; padding-top: 8px; }
+        .bill-cell p.total-row { font-size: 16px !important; font-weight: 700 !important; border-top: 1.5px solid #000; margin-top: 2px !important; padding-top: 10px; padding-bottom: 2px; }
     }`;
   document.head.appendChild(style);
   const chunks = [tenantIDs.slice(0, 9), tenantIDs.slice(9, 18)];
@@ -722,7 +722,7 @@ function generatePrintView()  {
             <p><strong>বিদ্যুৎ বিল</strong>&nbsp;(${enToBnNumber(rate)}৳ হারে)${bsrgo}&nbsp;<strong>${enToBnNumber(eBill.toFixed(0))}/-</strong></p>
             <p>মাসিক ভাড়াঃ ${enToBnNumber(rent)}/-</p>
             <p>${id === "6B" ? "গ্যাস বিল ও সিঁড়ি ঝাড়ু" : "সিঁড়ি ঝাড়ু"}ঃ ${enToBnNumber(serv)}/-</p>
-            <p><strong>${targetMonthName} মাসের বকেয়াঃ ${enToBnNumber(dues.toFixed(0))}৳</strong></p>
+            <p><strong>আগের মাসের বকেয়াঃ ${enToBnNumber(dues.toFixed(0))}৳</strong></p>
             ${advNote}
             <p class="total-row"><strong>এই মাসে মোট পাওনাঃ ${enToBnNumber(total.toFixed(0))}৳</strong></p>
             <div style="margin-top:10px; font-size:12px; border-top: 2px dashed #000; padding-top:4px; text-align: center; line-height: 1.3;">
@@ -736,6 +736,7 @@ function generatePrintView()  {
   });
   window.print();
 }
+
 
 
 
