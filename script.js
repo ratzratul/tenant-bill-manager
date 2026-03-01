@@ -685,11 +685,11 @@ function generatePrintView()  {
     @media print {
         @page { margin: ${printMargin} !important; }
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        .bill-cell { font-family: 'Noto Sans Bengali', sans-serif; line-height: 1.2; color: #000; padding: 5px; border: 1px solid #ccc; }
+        .bill-cell { font-family: 'Noto Sans Bengali', sans-serif; line-height: 1.2; color: #000; padding: 3px; border: 1px solid #ccc; }
         .bill-cell h4 { margin: 0 0 2px 0; font-size: 17px !important; font-weight: 500; text-align: center; border-bottom: 2px solid #000; padding-bottom: 3px; }
         .bill-cell p { margin: 3px 0; font-size: 15px !important; font-weight: 500; display: flex; }
         .bill-cell p.adv-note { color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center; }
-        .bill-cell p.total-row { font-size: 16px !important; font-weight: 700 !important; border-top: 1.5px solid #000; margin-top: 2px !important; padding-top: 10px; padding-bottom: 2px; }
+        .bill-cell p.total-row { font-size: 16px !important; font-weight: 700 !important; border-top: 1.5px solid #000; margin-top: 2px !important; padding-top: 12px; padding-bottom: 2px; }
     }`;
   document.head.appendChild(style);
   const chunks = [tenantIDs.slice(0, 9), tenantIDs.slice(9, 18)];
@@ -724,8 +724,8 @@ function generatePrintView()  {
             <p>${id === "6B" ? "গ্যাস বিল ও সিঁড়ি ঝাড়ু" : "সিঁড়ি ঝাড়ু"}ঃ ${enToBnNumber(serv)}/-</p>
             <p><strong>আগের মাসের বকেয়াঃ ${enToBnNumber(dues.toFixed(0))}৳</strong></p>
             ${advNote}
-            <p class="total-row"><strong>এই মাসে মোট পাওনাঃ ${enToBnNumber(total.toFixed(0))}৳</strong></p>
-            <div style="margin-top:10px; font-size:12px; border-top: 2px dashed #000; padding-top:4px; text-align: center; line-height: 1.3;">
+            <p class="total-row"><strong>এই মাসে পাওনাঃ ${enToBnNumber(total.toFixed(0))}৳</strong></p>
+            <div style="margin-top:10px; font-size:12px; font-style: italic; border-top: 2px dashed #000; padding-top:4px; text-align: center; line-height: 1.3;">
             <strong>প্রতি মাসের ৫ তারিখের মধ্যে কারেন্ট বিলের টাকা বিকাশ করতে হবে। বিকাশ নাম্বারঃ 01944529442 রেফারেন্স(Ref): ${id}</strong>
             </div>
             </div>`;
@@ -736,10 +736,3 @@ function generatePrintView()  {
   });
   window.print();
 }
-
-
-
-
-
-
-
