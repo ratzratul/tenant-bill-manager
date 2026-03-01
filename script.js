@@ -688,6 +688,7 @@ function generatePrintView()  {
         .bill-cell { font-family: 'Noto Sans Bengali', sans-serif; line-height: 1.2; color: #000; padding: 5px; border: 1px solid #ccc; }
         .bill-cell h4 { margin: 0 0 2px 0; font-size: 17px !important; font-weight: 500; text-align: center; border-bottom: 2px solid #000; padding-bottom: 3px; }
         .bill-cell p { margin: 3px 0; font-size: 15px !important; font-weight: 500; display: flex; }
+        .bill-cell p.adv-note { color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center; }
         .total-row { font-size: 16px !important; font-weight: 700 !important; border-top: 1.5px solid #000 !important; margin-top: 6px !important; padding-top: 8px; }
     }`;
   document.head.appendChild(style);
@@ -709,7 +710,7 @@ function generatePrintView()  {
       const dues = (lTot - lPad);
       const total = eBill + rent + serv + dues;
       // অ্যাডভান্স নোট লজিক
-      const advNote = (typeof adjustedAdvances !== 'undefined' && adjustedAdvances[id]) ? `<div style="color: #006666; font-size: 12px; font-style: italic; margin: 2px 0; text-align: center;">* অ্যাডভান্স ৳${enToBnNumber(adjustedAdvances[id])} বাদ দেয়া হয়েছে।</div>` : "";
+      const advNote = (typeof adjustedAdvances !== 'undefined' && adjustedAdvances[id]) ? `<p class="adv-note">* অ্যাডভান্স ৳${enToBnNumber(adjustedAdvances[id])} বাদ দেয়া হয়েছে।</p>` : "";
       const shortFormattedMonth = formattedMonth.replace(" - ২০", " - '");
       const bsrgo = '<span style="display:inline-flex; width:0.5em; overflow:hidden; justify-content:flex-end; vertical-align:baseline;">বঃ</span>';
       html += `
@@ -735,6 +736,7 @@ function generatePrintView()  {
   });
   window.print();
 }
+
 
 
 
