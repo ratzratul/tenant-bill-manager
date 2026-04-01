@@ -139,55 +139,67 @@ function togglePanel(e) {
 }
 
 async function calculateAll() {
-	if (!confirm("আপনি কি নিশ্চিত যে হিসাব সেভ করতে চান?")) return;
-	let e = parseFloat(document.getElementById("globalUnitRate").value) || 8.5;
-	localStorage.setItem("globalUnitRate", e);
-	let t = document.getElementById("pin-input").value;
-	showGlobalLoader("সব ফ্ল্যাটের হিসাব তৈরি ও সেভ হচ্ছে...");
-	let l = [],
-		n = currentSelectedMonth;
-	tenantIDs.forEach(e => {
-		let t = parseFloat(document.getElementById(`currM-${e}`).value) || 0,
-			a = parseFloat(document.getElementById(`prevM-${e}`).value) || 0,
-			i = parseFloat(document.getElementById(`rent-${e}`).value) || 0,
-			r = parseFloat(document.getElementById(`gas-${e}`).value) || 0,
-			d = parseFloat(document.getElementById(`lastTotal-${e}`).value) || 0,
-			o = parseFloat(document.getElementById(`lastPaid-${e}`).value) || 0,
-			c = t - a,
-			s = calculateElectricityBill(c).toFixed(0),
-			u = d - o,
-			p = (parseFloat(s) + i + r + u).toFixed(0);
-		db[e] && (db[e].serverEBill = s), updateHeaderLabel(e, c, s, u.toFixed(0), p), l.push({
-			id: e,
-			month: n,
-			prevM: a,
-			currM: t,
-			units: c,
-			eBill: s,
-			rent: i,
-			service: r,
-			dues: d,
-			paid: o,
-			total: p
-		})
-	});
-	try {
-		await fetch(SHEET_URL, {
-			method: "POST",
-			mode: "no-cors",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				pin: t,
-				data: l
-			})
-		}), showGlobalLoader("✅ হিসাব সম্পন্ন এবং সার্ভারে সেভ হয়েছে!"), await new Promise(e => setTimeout(e, 1500))
-	} catch (a) {
-		alert("সার্ভার এরর!")
-	} finally {
-		hideGlobalLoader()
-	}
+    if (!confirm("আপনি কি নিশ্চিত যে হিসাব সেভ করতে চান?")) return;
+
+    // PIN input safety check to prevent null errors
+    let pinElement = document.getElementById("pin-input");
+    let pinValue = pinElement ? pinElement.value : "";
+    
+    showGlobalLoader("সব ফ্ল্যাটের হিসাব তৈরি ও সেভ হচ্ছে...");
+    
+    let l = [];
+    let n = currentSelectedMonth;
+
+    tenantIDs.forEach(e => {
+        // Using optional chaining (?.) so if an input is missing, it won't crash
+        let t = parseFloat(document.getElementById(`currM-${e}`)?.value) || 0,
+            a = parseFloat(document.getElementById(`prevM-${e}`)?.value) || 0,
+            i = parseFloat(document.getElementById(`rent-${e}`)?.value) || 0,
+            r = parseFloat(document.getElementById(`gas-${e}`)?.value) || 0,
+            d = parseFloat(document.getElementById(`lastTotal-${e}`)?.value) || 0,
+            o = parseFloat(document.getElementById(`lastPaid-${e}`)?.value) || 0,
+            c = t - a,
+            s = calculateElectricityBill(c).toFixed(0), // Multi-tier calculation
+            u = d - o,
+            p = (parseFloat(s) + i + r + u).toFixed(0);
+
+        db[e] && (db[e].serverEBill = s);
+        updateHeaderLabel(e, c, s, u.toFixed(0), p);
+        
+        l.push({
+            id: e,
+            month: n,
+            prevM: a,
+            currM: t,
+            units: c,
+            eBill: s,
+            rent: i,
+            service: r,
+            dues: d,
+            paid: o,
+            total: p
+        });
+    });
+
+    try {
+        await fetch(SHEET_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                pin: pinValue,
+                data: l
+            })
+        });
+        showGlobalLoader("✅ হিসাব সম্পন্ন এবং সার্ভারে সেভ হয়েছে!");
+        await new Promise(resolve => setTimeout(resolve, 1500));
+    } catch (error) {
+        alert("সার্ভার এরর!");
+    } finally {
+        hideGlobalLoader();
+    }
 }
 
 async function saveDepositEntry(e) {
